@@ -1,208 +1,189 @@
 "use client";
 
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { motion } from "motion/react";
-import {
-  ArrowRight,
-  BarChart3,
-  Globe2,
-  Link2,
-  QrCode,
-  Radio,
-  Sparkles,
-  Smartphone,
-} from "lucide-react";
+import { ChartColumn, Link2, MapPin, MonitorSmartphone, QrCode, Radio } from "lucide-react";
+import { useI18n } from "@/i18n/client";
+import { AppIcon } from "@/components/app-icon";
+import { MoreLink } from "@/components/more-link";
+import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
+const EASE = [0.2, 0.7, 0.2, 1] as const;
+
+// Feature tiles, each with an Apple system colour, like iOS Settings icons.
 const FEATURES = [
-  {
-    icon: Link2,
-    title: "Clean short links",
-    desc: "Pick a memorable slug or let Snip generate one. Redirects fire in milliseconds.",
-  },
-  {
-    icon: BarChart3,
-    title: "Real analytics, not vanity counts",
-    desc: "Daily trend charts, referrer sources, and device breakdowns for every link you create.",
-  },
-  {
-    icon: Radio,
-    title: "Live click ticker",
-    desc: "Open the dashboard and watch clicks land in real time — no refresh needed.",
-  },
-  {
-    icon: Globe2,
-    title: "Geography, out of the box",
-    desc: "See which countries and cities your links are landing in, powered by edge geolocation.",
-  },
-  {
-    icon: QrCode,
-    title: "QR codes included",
-    desc: "Every link gets a downloadable QR code — generated on the fly, no extra service.",
-  },
-  {
-    icon: Smartphone,
-    title: "Built for every screen",
-    desc: "The dashboard and charts are fully responsive, with light and dark themes.",
-  },
-];
+  { id: "links", icon: Link2, color: "linear-gradient(145deg, #3a9bff, #0071e3)" },
+  { id: "analytics", icon: ChartColumn, color: "linear-gradient(145deg, #c77dea, #af52de)" },
+  { id: "live", icon: Radio, color: "linear-gradient(145deg, #5ee08a, #34c759)" },
+  { id: "geo", icon: MapPin, color: "linear-gradient(145deg, #5ccfe6, #30b0c7)" },
+  { id: "qr", icon: QrCode, color: "linear-gradient(145deg, #ffbf4d, #ff9f0a)" },
+  { id: "screens", icon: MonitorSmartphone, color: "linear-gradient(145deg, #ff6b88, #ff2d55)" },
+] as const;
 
-const PREVIEW_STATS = [
-  { label: "Clicks today", value: "142" },
-  { label: "Top referrer", value: "twitter.com" },
-  { label: "Top country", value: "US" },
-];
+const PREVIEW_BARS = [34, 48, 40, 58, 51, 76, 66];
 
 export default function Home() {
+  const { t, locale } = useI18n();
+  const { status } = useSession();
+  const signedIn = status === "authenticated";
+  const primaryHref = signedIn ? "/dashboard" : "/login";
+
   return (
-    <div className="relative overflow-hidden">
-      <div className="bg-mesh pointer-events-none absolute inset-x-0 top-0 -z-10 h-[720px]" />
-
+    <div className="flex flex-col">
       {/* Hero */}
-      <section className="mx-auto flex max-w-6xl flex-col items-center gap-8 px-4 pb-20 pt-20 text-center sm:px-6 md:pt-28">
-        <motion.span
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs font-medium text-muted"
-        >
-          <Sparkles className="h-3.5 w-3.5 text-primary" /> A short-link platform with real analytics
-        </motion.span>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl md:text-6xl"
-        >
-          Every click,{" "}
-          <span className="bg-gradient-to-r from-[#4f46e5] to-[#0e7490] bg-clip-text text-transparent">
-            tracked live.
-          </span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.12 }}
-          className="max-w-xl text-balance text-muted"
-        >
-          Snip turns any long URL into a short one — then shows you exactly who clicked it, from where, and on
-          what, the moment it happens.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.18 }}
-          className="flex flex-wrap items-center justify-center gap-3"
-        >
-          <Button size="lg" asChild>
-            <Link href="/login">
-              Get started <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Button size="lg" variant="secondary" asChild>
-            <Link href="/login">Try the demo account</Link>
-          </Button>
-        </motion.div>
-
-        {/* Floating preview card */}
-        <motion.div
-          initial={{ opacity: 0, y: 40, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 w-full max-w-2xl"
-        >
-          <Card className="glass p-5 text-left shadow-2xl">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 animate-pulse-ring rounded-full bg-accent" />
-                <p className="text-sm font-medium">snip.yetao.org/launch</p>
-              </div>
-              <span className="text-xs text-muted">Live</span>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              {PREVIEW_STATS.map((s, i) => (
-                <motion.div
-                  key={s.label}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + i * 0.1, duration: 0.5 }}
-                  className="rounded-xl bg-surface-2 p-3 text-center"
-                >
-                  <p className="text-lg font-semibold">{s.value}</p>
-                  <p className="text-[11px] text-muted">{s.label}</p>
-                </motion.div>
-              ))}
-            </div>
-          </Card>
-        </motion.div>
-      </section>
-
-      {/* Feature grid */}
-      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5 }}
-          className="mb-10 text-center"
-        >
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Everything a short link needs</h2>
-          <p className="mx-auto mt-2 max-w-xl text-sm text-muted">
-            Not just a redirect — a small analytics platform for every link you create.
+      <section className="overflow-hidden px-5 pb-20 pt-14 text-center sm:pb-28 sm:pt-24">
+        <div className="mx-auto flex max-w-[980px] flex-col items-center">
+          <div className="animate-rise">
+            <AppIcon size={84} />
+          </div>
+          <p className="animate-rise mt-7 text-[17px] font-semibold text-muted [animation-delay:60ms] sm:text-[21px]">
+            {t("landing.eyebrow")}
           </p>
-        </motion.div>
+          <h1 className="animate-rise mt-1 text-[64px] font-bold leading-[1.05] tracking-tight [animation-delay:120ms] sm:text-[96px] md:text-[112px]">
+            Snip
+          </h1>
+          <p className="headline animate-rise mt-3 max-w-[820px] text-balance text-[30px] font-semibold leading-[1.12] tracking-tight [animation-delay:180ms] sm:text-[44px] md:text-[52px]">
+            {t("landing.taglineLead")}
+            {locale === "zh-CN" ? "" : " "}
+            <span className="text-gradient-snip">{t("landing.taglineAccent")}</span>
+          </p>
+          <p className="animate-rise mt-6 max-w-[640px] text-balance text-[17px] leading-[1.5] text-muted [animation-delay:240ms] sm:text-[21px]">
+            {t("landing.lead")}
+          </p>
+          <div className="animate-rise mt-9 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 [animation-delay:300ms]">
+            <Button asChild size="lg">
+              <Link href={primaryHref}>{signedIn ? t("nav.dashboard") : t("landing.ctaPrimary")}</Link>
+            </Button>
+            {!signedIn && (
+              <MoreLink href="/login" className="text-[17px]">
+                {t("landing.ctaDemo")}
+              </MoreLink>
+            )}
+          </div>
+        </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f, i) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.45, delay: (i % 3) * 0.08 }}
-            >
-              <Card className="h-full p-5 transition-transform hover:-translate-y-1 hover:shadow-lg">
-                <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary-soft text-primary">
-                  <f.icon className="h-5 w-5" />
-                </span>
-                <h3 className="mb-1 font-semibold">{f.title}</h3>
-                <p className="text-sm text-muted">{f.desc}</p>
-              </Card>
-            </motion.div>
-          ))}
+        <div className="animate-rise mx-auto mt-14 max-w-[760px] [animation-delay:380ms] sm:mt-20">
+          <PreviewCard />
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="mx-auto max-w-4xl px-4 pb-24 sm:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card className="glass relative overflow-hidden p-8 text-center sm:p-12">
-            <div className="bg-mesh pointer-events-none absolute inset-0 -z-10 opacity-60" />
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Ready to see it live?</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-muted">
-              Sign in with the demo account — no setup required.
-            </p>
-            <Button size="lg" className="mt-6" asChild>
-              <Link href="/login">
-                Sign in <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </Card>
-        </motion.div>
+      {/* Features */}
+      <section className="bg-background-alt px-5 py-20 sm:py-28">
+        <div className="mx-auto max-w-[980px]">
+          <Reveal>
+            <h2 className="headline mb-10 text-balance text-[32px] font-semibold leading-[1.08] tracking-tight sm:mb-14 sm:text-[48px] md:text-[56px]">
+              {t("landing.featuresTitle")}
+              <span className="block text-muted">{t("landing.featuresSubtitle")}</span>
+            </h2>
+          </Reveal>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 [&>.reveal]:h-full">
+            {FEATURES.map((f, i) => (
+              <Reveal key={f.id} delay={(i % 3) * 90}>
+                <article className="flex h-full flex-col rounded-[28px] bg-surface p-7 shadow-[var(--card-shadow)] transition-[transform,box-shadow] duration-500 ease-[var(--ease)] hover:scale-[1.015] hover:shadow-[var(--card-shadow-hover)] sm:p-8">
+                  <span
+                    className="grid h-11 w-11 place-items-center rounded-[11px] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]"
+                    style={{ background: f.color }}
+                    aria-hidden="true"
+                  >
+                    <f.icon className="h-[22px] w-[22px]" strokeWidth={1.8} />
+                  </span>
+                  <h3 className="headline mt-6 text-[21px] font-semibold leading-tight tracking-tight">
+                    {t(`landing.features.${f.id}.title` as const)}
+                  </h3>
+                  <p className="mt-2 text-[17px] text-muted">{t(`landing.features.${f.id}.body` as const)}</p>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </div>
       </section>
 
-      <footer className="border-t border-border py-8 text-center text-xs text-muted">
-        Snip — a portfolio build. Not affiliated with any URL-shortening service.
+      {/* Call to action */}
+      <section className="px-5 py-20 text-center sm:py-28">
+        <Reveal className="mx-auto max-w-[980px]">
+          <h2 className="headline text-balance text-[32px] font-semibold leading-[1.08] tracking-tight sm:text-[48px]">
+            {t("landing.ctaTitle")}
+          </h2>
+          <p className="mx-auto mt-4 max-w-[560px] text-balance text-[17px] text-muted sm:text-[21px]">
+            {t("landing.ctaBody")}
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            <Button asChild size="lg">
+              <Link href={primaryHref}>{signedIn ? t("nav.dashboard") : t("landing.ctaButton")}</Link>
+            </Button>
+            <MoreLink href="https://yetao.org" external className="text-[17px]">
+              {t("landing.footerMore")}
+            </MoreLink>
+          </div>
+        </Reveal>
+      </section>
+
+      <footer className="bg-background-alt px-5 text-[12px] text-muted">
+        <div className="mx-auto flex max-w-[980px] flex-col gap-1 py-5 pb-[max(20px,env(safe-area-inset-bottom))] sm:flex-row sm:justify-between sm:gap-6">
+          <p>© {new Date().getFullYear()} Tao Ye · Snip</p>
+          <p>{t("landing.footerNote")}</p>
+        </div>
       </footer>
     </div>
+  );
+}
+
+/** A product-shot style card that previews a link's live analytics. */
+function PreviewCard() {
+  const { t, fmt } = useI18n();
+  const stats = [
+    { label: t("landing.preview.clicksToday"), value: fmt.number(142) },
+    { label: t("landing.preview.topReferrer"), value: "github.com" },
+    { label: t("landing.preview.topCountry"), value: fmt.region("US") },
+  ];
+
+  return (
+    <figure
+      aria-label={t("landing.preview.label")}
+      className="rounded-[28px] bg-surface p-5 text-left shadow-[var(--hero-shadow)] sm:p-8"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <AppIcon size={24} />
+          <span className="truncate font-mono text-[14px] font-medium sm:text-[15px]">snip.yetao.org/launch</span>
+        </div>
+        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-success-soft px-2.5 py-1 text-[12px] font-medium text-success">
+          <span className="h-1.5 w-1.5 animate-pulse-ring rounded-full bg-live" />
+          {t("landing.preview.live")}
+        </span>
+      </div>
+
+      <dl className="mt-6 grid grid-cols-3 divide-x divide-separator">
+        {stats.map((s) => (
+          <div key={s.label} className="flex min-w-0 flex-col-reverse justify-end gap-1 px-2 first:pl-0 last:pr-0 sm:px-6">
+            <dt className="text-[12px] leading-snug text-muted sm:text-[13px]">{s.label}</dt>
+            <dd className="text-[15px] font-semibold leading-tight tracking-tight sm:text-[28px]">{s.value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div className="mt-6 rounded-[18px] bg-background-alt p-4 sm:p-5">
+        <p className="text-[12px] text-muted sm:text-[13px]">{t("landing.preview.lastWeek")}</p>
+        <div className="mt-3 flex h-24 items-end gap-2 sm:h-32 sm:gap-3" aria-hidden="true">
+          {PREVIEW_BARS.map((h, i) => (
+            <motion.span
+              key={i}
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              transition={{ delay: 0.5 + i * 0.06, duration: 0.7, ease: EASE }}
+              style={{ height: `${h}%`, originY: 1 }}
+              className={
+                i === PREVIEW_BARS.length - 1
+                  ? "flex-1 rounded-[6px] bg-[var(--chart-blue)]"
+                  : "flex-1 rounded-[6px] bg-[var(--chart-blue)] opacity-35"
+              }
+            />
+          ))}
+        </div>
+      </div>
+    </figure>
   );
 }

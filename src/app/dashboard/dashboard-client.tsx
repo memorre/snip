@@ -5,15 +5,24 @@ import Link from "next/link";
 import useSWR from "swr";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
-import { BarChart3, Copy, ExternalLink, Link2, MousePointerClick, Trash2 } from "lucide-react";
+import { ChevronRight, Copy, Link2, Trash2 } from "lucide-react";
 import { fetcher } from "@/lib/fetcher";
 import { toggleLink, deleteLink } from "@/app/actions";
 import type { LinkSummaryDTO } from "@/lib/data";
-import { Card, CardContent } from "@/components/ui/card";
+import { useI18n } from "@/i18n/client";
+import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { CreateLinkDialog } from "./create-link-dialog";
 
 export function DashboardClient({
@@ -23,10 +32,12 @@ export function DashboardClient({
   userName: string;
   initialLinks: LinkSummaryDTO[];
 }) {
+  const { t, fmt } = useI18n();
   const { data: links = initialLinks, mutate } = useSWR<LinkSummaryDTO[]>("/api/links", fetcher, {
     fallbackData: initialLinks,
     refreshInterval: 20000,
   });
+  const [pendingDelete, setPendingDelete] = React.useState<LinkSummaryDTO | null>(null);
 
   const [origin, setOrigin] = React.useState("");
   React.useEffect(() => {
@@ -37,6 +48,7 @@ export function DashboardClient({
 
   const totalClicks = links.reduce((acc, l) => acc + l.totalClicks, 0);
   const clicksThisWeek = links.reduce((acc, l) => acc + l.clicksLast7Days, 0);
+  const activeLinks = links.filter((l) => !l.disabled).length;
 
   async function handleToggle(link: LinkSummaryDTO) {
     mutate(
@@ -47,124 +59,207 @@ export function DashboardClient({
     mutate();
   }
 
-  async function handleDelete(link: LinkSummaryDTO) {
+  async function confirmDelete() {
+    const link = pendingDelete;
+    if (!link) return;
+    setPendingDelete(null);
     mutate(
       links.filter((l) => l.id !== link.id),
       false
     );
     await deleteLink(link.id);
-    toast.success(`Deleted ${link.slug}`);
+    toast.success(t("dashboard.deleted", { slug: link.slug }));
     mutate();
+  }
+
+  function createdLabel(createdAt: string) {
+    const since = fmt.since(createdAt);
+    return since ? t("dashboard.created", { time: since }) : t("dashboard.createdJustNow");
   }
 
   function copy(slug: string) {
     navigator.clipboard.writeText(`${origin}/${slug}`);
-    toast.success("Link copied");
+    toast.success(t("dashboard.copied"));
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="mb-6 flex flex-wrap items-end justify-between gap-4"
-      >
-        <div>
-          <p className="text-sm text-muted">Welcome back,</p>
-          <h1 className="text-2xl font-semibold tracking-tight">{userName}</h1>
-        </div>
-        <CreateLinkDialog />
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.05 }}
-        className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3"
-      >
-        <StatCard icon={Link2} label="Active links" value={String(links.filter((l) => !l.disabled).length)} />
-        <StatCard icon={MousePointerClick} label="Total clicks" value={totalClicks.toLocaleString()} />
-        <StatCard icon={BarChart3} label="Clicks this week" value={clicksThisWeek.toLocaleString()} />
-      </motion.div>
-
-      <div className="flex flex-col gap-2">
-        <AnimatePresence initial={false}>
-          {links.map((link, i) => (
-            <motion.div
-              key={link.id}
-              layout
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.97 }}
-              transition={{ duration: 0.3, delay: Math.min(i, 6) * 0.03 }}
-            >
-              <Card className={link.disabled ? "opacity-60" : undefined}>
-                <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex flex-wrap items-center gap-2">
-                      <Link
-                        href={`/dashboard/${link.slug}`}
-                        className="font-mono text-sm font-semibold text-primary hover:underline"
-                      >
-                        /{link.slug}
-                      </Link>
-                      {link.title && <span className="text-sm text-muted">· {link.title}</span>}
-                      {link.disabled && <Badge variant="warning">Disabled</Badge>}
-                    </div>
-                    <p className="flex items-center gap-1 truncate text-xs text-muted">
-                      <ExternalLink className="h-3 w-3 shrink-0" />
-                      {link.targetUrl}
-                    </p>
-                    <p className="mt-1 text-xs text-muted">
-                      {link.totalClicks.toLocaleString()} clicks total · created{" "}
-                      {formatDistanceToNow(new Date(link.createdAt), { addSuffix: true })}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link href={`/dashboard/${link.slug}`}>
-                        <BarChart3 className="h-3.5 w-3.5" /> Stats
-                      </Link>
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => copy(link.slug)} aria-label="Copy link">
-                      <Copy className="h-3.5 w-3.5" />
-                    </Button>
-                    <Switch checked={!link.disabled} onCheckedChange={() => handleToggle(link)} aria-label="Enabled" />
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(link)} aria-label="Delete link">
-                      <Trash2 className="h-3.5 w-3.5 text-danger" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-
-        {links.length === 0 && (
-          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border py-16 text-center">
-            <Link2 className="h-8 w-8 text-muted" />
-            <p className="text-sm text-muted">No links yet — create your first one to get started.</p>
+    <div className="flex-1 bg-background-alt">
+      <div className="mx-auto max-w-[980px] px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
+          className="flex flex-wrap items-end justify-between gap-4"
+        >
+          <div className="min-w-0">
+            <p className="text-[15px] font-semibold text-muted sm:text-[17px]">{t("dashboard.welcome")}</p>
+            <h1 className="truncate text-[32px] font-bold leading-tight tracking-tight sm:text-[40px]">{userName}</h1>
           </div>
-        )}
+          <CreateLinkDialog />
+        </motion.div>
+
+        <motion.section
+          aria-label={t("dashboard.summary")}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.05, ease: [0.2, 0.7, 0.2, 1] }}
+          className="mt-8"
+        >
+          <Card className="grid grid-cols-3 divide-x divide-separator py-5">
+            <Stat label={t("dashboard.stats.active")} value={fmt.number(activeLinks)} />
+            <Stat label={t("dashboard.stats.total")} value={fmt.number(totalClicks)} />
+            <Stat label={t("dashboard.stats.week")} value={fmt.number(clicksThisWeek)} />
+          </Card>
+        </motion.section>
+
+        <section className="mt-10">
+          <h2 className="mb-3 px-1 text-[21px] font-semibold tracking-tight">{t("dashboard.linksTitle")}</h2>
+
+          {links.length === 0 ? (
+            <Card className="flex flex-col items-center gap-3 px-6 py-16 text-center">
+              <span className="grid h-14 w-14 place-items-center rounded-[14px] bg-fill text-muted">
+                <Link2 className="h-6 w-6" strokeWidth={1.75} />
+              </span>
+              <p className="text-[17px] font-semibold">{t("dashboard.empty.title")}</p>
+              <p className="max-w-xs text-[15px] text-muted">{t("dashboard.empty.body")}</p>
+            </Card>
+          ) : (
+            <Card className="overflow-hidden">
+              <ul>
+                <AnimatePresence initial={false}>
+                  {links.map((link, i) => (
+                    <motion.li
+                      key={link.id}
+                      layout="position"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={cn("relative", i > 0 && "border-t border-separator")}
+                    >
+                      <LinkRow
+                        link={link}
+                        createdLabel={createdLabel(link.createdAt)}
+                        onCopy={() => copy(link.slug)}
+                        onToggle={() => handleToggle(link)}
+                        onDelete={() => setPendingDelete(link)}
+                      />
+                    </motion.li>
+                  ))}
+                </AnimatePresence>
+              </ul>
+            </Card>
+          )}
+        </section>
       </div>
+
+      <Dialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>
+        <DialogContent hideClose className="max-w-sm">
+          {pendingDelete && (
+            <>
+              <DialogHeader className="pr-0">
+                <DialogTitle className="break-all">{t("dashboard.confirmDelete.title", { slug: pendingDelete.slug })}</DialogTitle>
+                <DialogDescription>
+                  {t("dashboard.confirmDelete.body", { count: pendingDelete.totalClicks })}
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="secondary" onClick={() => setPendingDelete(null)}>
+                  {t("common.cancel")}
+                </Button>
+                <Button variant="danger" onClick={confirmDelete}>
+                  {t("dashboard.confirmDelete.confirm")}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-function StatCard({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <Card>
-      <CardContent className="flex items-center gap-3 p-4">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
-          <Icon className="h-4 w-4" />
+    <div className="flex min-w-0 flex-col gap-1 px-4 sm:px-6">
+      <span className="text-[24px] font-semibold leading-tight tracking-tight tabular-nums sm:text-[28px]">{value}</span>
+      <span className="text-[12px] leading-snug text-muted sm:text-[13px]">{label}</span>
+    </div>
+  );
+}
+
+function LinkRow({
+  link,
+  createdLabel,
+  onCopy,
+  onToggle,
+  onDelete,
+}: {
+  link: LinkSummaryDTO;
+  createdLabel: string;
+  onCopy: () => void;
+  onToggle: () => void;
+  onDelete: () => void;
+}) {
+  const { t } = useI18n();
+  return (
+    <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-5">
+      <div className="flex min-w-0 flex-1 items-start gap-3.5">
+        <span
+          className={cn(
+            "mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-[10px] transition-colors",
+            link.disabled ? "bg-fill text-muted" : "bg-primary-soft text-link"
+          )}
+          aria-hidden="true"
+        >
+          <Link2 className="h-[18px] w-[18px]" strokeWidth={2} />
         </span>
-        <div>
-          <p className="text-lg font-semibold leading-tight">{value}</p>
-          <p className="text-xs text-muted">{label}</p>
+        <div className={cn("min-w-0 flex-1 transition-opacity", link.disabled && "opacity-60")}>
+          <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
+            <Link
+              href={`/dashboard/${link.slug}`}
+              className="truncate font-mono text-[15px] font-semibold text-foreground hover:text-link"
+            >
+              /{link.slug}
+            </Link>
+            {link.title && <span className="min-w-0 truncate text-[15px] text-muted">{link.title}</span>}
+            {link.disabled && <Badge variant="warning">{t("dashboard.disabled")}</Badge>}
+          </div>
+          <p className="mt-0.5 truncate text-[13px] text-muted">{link.targetUrl}</p>
+          <p className="mt-1 text-[12px] text-muted-2" suppressHydrationWarning>
+            {t("dashboard.clicks", { count: link.totalClicks })} · {createdLabel}
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      <div className="flex items-center justify-between gap-1 sm:justify-end sm:gap-2">
+        <Button variant="ghost" size="sm" asChild className="text-link max-sm:-ml-4">
+          <Link href={`/dashboard/${link.slug}`}>
+            {t("dashboard.analytics")}
+            <ChevronRight className="-mr-1 h-3.5 w-3.5" />
+          </Link>
+        </Button>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Button variant="ghost" size="icon" onClick={onCopy} aria-label={t("dashboard.copy")} title={t("dashboard.copy")}>
+            <Copy className="h-4 w-4 text-muted" strokeWidth={1.75} />
+          </Button>
+          <Switch
+            checked={!link.disabled}
+            onCheckedChange={onToggle}
+            aria-label={t("dashboard.toggle")}
+            className="mx-1"
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onDelete}
+            aria-label={t("dashboard.delete")}
+            title={t("dashboard.delete")}
+          >
+            <Trash2 className="h-4 w-4 text-danger" strokeWidth={1.75} />
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,26 +1,27 @@
 import Link from "next/link";
 import { Link2Off } from "lucide-react";
+import { getT } from "@/i18n/server";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getT();
+
   return (
-    <div className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-4">
-      <div className="bg-mesh pointer-events-none absolute inset-0" />
-      <Card className="glass relative z-10 flex max-w-sm flex-col items-center gap-4 p-10 text-center">
-        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-soft text-primary">
-          <Link2Off className="h-6 w-6" />
+    <div className="flex flex-1 items-center justify-center bg-background-alt px-5 py-24">
+      {/* not-found.js can't export metadata; React hoists this into <head>. */}
+      <title>{`${t("meta.notFound")} · Snip`}</title>
+      <div className="flex max-w-[480px] flex-col items-center text-center">
+        <span className="grid h-16 w-16 place-items-center rounded-[16px] bg-fill text-muted" aria-hidden="true">
+          <Link2Off className="h-7 w-7" strokeWidth={1.75} />
         </span>
-        <div>
-          <h1 className="text-lg font-semibold tracking-tight">This link doesn&apos;t exist</h1>
-          <p className="mt-1 text-sm text-muted">
-            It may have been disabled, expired, or never existed in the first place.
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/">Back to Snip</Link>
+        <h1 className="mt-7 text-balance text-[32px] font-semibold leading-[1.1] tracking-tight sm:text-[40px]">
+          {t("notFound.title")}
+        </h1>
+        <p className="mt-3 text-balance text-[17px] text-muted">{t("notFound.body")}</p>
+        <Button asChild size="lg" className="mt-8">
+          <Link href="/">{t("notFound.home")}</Link>
         </Button>
-      </Card>
+      </div>
     </div>
   );
 }

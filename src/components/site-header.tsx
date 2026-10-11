@@ -1,9 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import { LayoutDashboard, Link2, LogOut } from "lucide-react";
+import { LayoutDashboard, LogOut } from "lucide-react";
+import { useT } from "@/i18n/client";
+import { cn } from "@/lib/utils";
+import { AppIcon } from "@/components/app-icon";
 import { Button } from "@/components/ui/button";
+import { LanguageMenu } from "@/components/language-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   DropdownMenu,
@@ -25,63 +30,77 @@ function initials(name: string) {
 }
 
 export function SiteHeader() {
+  const t = useT();
+  const pathname = usePathname();
   const { data: session, status } = useSession();
+  const onDashboard = pathname.startsWith("/dashboard");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border">
-      <div className="glass absolute inset-0 -z-10" />
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-[0_8px_20px_-8px_var(--primary)]">
-            <Link2 className="h-4 w-4" />
-          </span>
+    <header className="glass sticky top-0 z-40 h-12 border-b border-[var(--nav-line)]">
+      <div className="mx-auto flex h-full max-w-[1024px] items-center gap-5 px-4 sm:px-6">
+        <Link
+          href="/"
+          aria-label={t("nav.home")}
+          className="mr-auto flex items-center gap-2.5 rounded-lg text-[17px] font-semibold tracking-tight text-foreground"
+        >
+          <AppIcon size={28} />
           <span>Snip</span>
         </Link>
 
         {status === "authenticated" && (
-          <Link
-            href="/dashboard"
-            className="hidden items-center gap-1.5 rounded-full border border-border bg-surface-2 px-3.5 py-1.5 text-sm font-medium text-muted transition-colors hover:text-foreground md:flex"
-          >
-            <LayoutDashboard className="h-3.5 w-3.5" />
-            Dashboard
-          </Link>
+          <nav className="hidden text-[13px] sm:block">
+            <Link
+              href="/dashboard"
+              aria-current={onDashboard ? "page" : undefined}
+              className={cn(
+                "text-foreground transition-opacity hover:opacity-100",
+                onDashboard ? "opacity-100" : "opacity-80"
+              )}
+            >
+              {t("nav.dashboard")}
+            </Link>
+          </nav>
         )}
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <LanguageMenu />
           <ThemeToggle />
           {status === "authenticated" ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="rounded-full transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <button
+                  type="button"
+                  aria-label={t("nav.account")}
+                  className="ml-1 grid h-8 w-8 place-items-center rounded-full transition-opacity hover:opacity-85"
+                >
                   <Avatar>
                     <AvatarFallback>{initials(session.user.name ?? "?")}</AvatarFallback>
                   </Avatar>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="min-w-[13rem]">
                 <DropdownMenuLabel>
-                  <div className="flex flex-col">
-                    <span className="font-medium text-foreground">{session.user.name}</span>
-                    <span className="text-[11px] text-muted">{session.user.email}</span>
-                  </div>
+                  <span className="block truncate text-[14px] font-semibold text-foreground">{session.user.name}</span>
+                  <span className="block truncate text-[12px] text-muted">{session.user.email}</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="md:hidden" asChild>
+                <DropdownMenuItem className="sm:hidden" asChild>
                   <Link href="/dashboard">
-                    <LayoutDashboard className="h-3.5 w-3.5" />
-                    Dashboard
+                    <LayoutDashboard className="h-4 w-4 text-muted" strokeWidth={1.75} />
+                    {t("nav.dashboard")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => signOut({ callbackUrl: "/" })}>
-                  <LogOut className="h-3.5 w-3.5" />
-                  Sign out
+                  <LogOut className="h-4 w-4 text-muted" strokeWidth={1.75} />
+                  {t("nav.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          ) : status === "loading" ? (
+            <span className="ml-1 h-7 w-7" aria-hidden="true" />
           ) : (
-            <Button asChild size="sm">
-              <Link href="/login">Sign in</Link>
+            <Button asChild size="nav" className="ml-1.5">
+              <Link href="/login">{t("nav.signIn")}</Link>
             </Button>
           )}
         </div>

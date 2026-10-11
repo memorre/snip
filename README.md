@@ -9,7 +9,8 @@ browser breakdowns, geography, and a live click ticker that updates the dashboar
 |---|---|---|
 | Framework | Next.js 16 (App Router, Turbopack) | Server Components + Server Actions for the CRUD paths, Route Handlers for redirects and streaming. |
 | Language | TypeScript | End-to-end types from schema to UI. |
-| Styling | Tailwind CSS v4 + hand-rolled Radix UI primitives | Same design-system approach as the rest of this portfolio, different palette (indigo/cyan). |
+| Styling | Tailwind CSS v4 + hand-rolled Radix UI primitives | Apple-style tokens shared with [yetao.org](https://yetao.org): system font stack, #f5f5f7 grouped backgrounds, frosted nav and menus, pill buttons, light/dark. |
+| i18n | Typed dictionaries + a small translator (no framework) | Simplified Chinese, English, French and Spanish; locale from a `lang` cookie shared across yetao.org, then `Accept-Language`. |
 | Animation | Motion (Framer Motion) | Page transitions, list reveals, animated chart containers. |
 | Charts | Recharts | Daily trend area chart, device donut chart. |
 | Data | Prisma ORM 7 + Postgres (Prisma Postgres via Vercel Marketplace) | Same database for local dev and production. |
@@ -71,6 +72,20 @@ This works well for a single Node.js instance (this pilot, or a single warm Verc
 in-memory `EventEmitter` doesn't fan out across multiple serverless instances. For horizontal scale, swap the
 backing store in `src/lib/live.ts` for a hosted pub/sub (Pusher, Ably, Supabase Realtime) — only that file's
 publish/subscribe implementation changes.
+
+### Languages
+
+The globe menu in the header switches between 简体中文, English, Français and Español. The choice is stored in a
+`lang` cookie (`Domain=yetao.org` in production, so the homepage and the other apps share it) and the page
+re-renders on the server without a reload. Without a cookie, the locale comes from `Accept-Language`, falling back
+to English.
+
+- Dictionaries live in [`src/i18n/dictionaries/`](src/i18n/dictionaries/). `en.ts` is the source of truth; the
+  other locales are typed against it, so a missing or extra key fails the build.
+- Server Components, Server Actions and Route Handlers use `getT()` from `src/i18n/server.ts`; Client Components use
+  `useI18n()` / `useT()` from `src/i18n/client.tsx`. Messages support `{name}` placeholders and plural forms
+  (`{ one, other, many }`, picked with `Intl.PluralRules`).
+- Dates, relative times, numbers and country names use `Intl` in the active locale.
 
 ### Access control
 
@@ -134,7 +149,8 @@ src/
       [slug]/                 per-link analytics (charts, QR, live ticker)
     [slug]/                   public redirect handler
     api/                      links, per-link stats, SSE live stream, auth
-  components/                design system (ui/) + qr-code, site-header
+  components/                design system (ui/) + app icon, language menu, qr-code, site-header
+  i18n/                       locale config, dictionaries (zh-CN, en, fr, es), server/client helpers
   hooks/                      use-live-clicks (SSE + SWR bridge)
   lib/                        prisma client, data access, click metadata parsing, slug generation
   auth.ts                     Auth.js configuration

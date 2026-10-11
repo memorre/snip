@@ -1,35 +1,36 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/site-header";
+import { getDictionary, getLocale, getT } from "@/i18n/server";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: { default: t("meta.title"), template: "%s · Snip" },
+    description: t("meta.description"),
+    applicationName: "Snip",
+  };
+}
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Snip — Short Links with Real Analytics",
-  description: "Create short links and watch clicks land in real time — referrers, devices, and geography.",
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // Resolved per request from the "lang" cookie, then Accept-Language, so the first paint is already
+  // in the right language.
+  const locale = await getLocale();
+
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
-        <Providers>
+    <html lang={locale} suppressHydrationWarning className="h-full">
+      <body className="flex min-h-full flex-col">
+        <Providers locale={locale} dictionary={getDictionary(locale)}>
           <SiteHeader />
-          <main className="flex-1">{children}</main>
+          <main className="flex flex-1 flex-col">{children}</main>
         </Providers>
       </body>
     </html>
