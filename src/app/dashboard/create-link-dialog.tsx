@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useActionState } from "react";
 import { toast } from "sonner";
+import { useSWRConfig } from "swr";
 import { Check, Copy, Plus } from "lucide-react";
 import { createLink, type ActionState } from "@/app/actions";
 import { useT } from "@/i18n/client";
@@ -50,12 +51,16 @@ function CreateLinkForm({ onClose }: { onClose: () => void }) {
   const t = useT();
   const [state, formAction, pending] = useActionState<ActionState, FormData>(createLink, undefined);
   const [copied, setCopied] = React.useState(false);
+  const { mutate } = useSWRConfig();
 
   const shortUrl =
     state?.success && state.slug && typeof window !== "undefined" ? `${window.location.origin}/${state.slug}` : null;
 
   React.useEffect(() => {
-    if (state?.success) toast.success(t("create.created"));
+    if (!state?.success) return;
+    toast.success(t("create.created"));
+    // Refresh the dashboard's link list so the new link shows up right away.
+    mutate("/api/links");
     // Announce once per result; `t` changing language shouldn't re-toast.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
@@ -108,7 +113,9 @@ function CreateLinkForm({ onClose }: { onClose: () => void }) {
         <div className="flex flex-col gap-2">
           <p className="text-[13px] font-medium text-muted">{t("create.ready")}</p>
           <div className="flex items-center gap-2 rounded-xl bg-background-alt py-1.5 pl-3.5 pr-1.5">
-            <span className="flex-1 truncate font-mono text-[15px] font-medium text-link">{shortUrl}</span>
+            <span className="min-w-0 flex-1 break-all py-1 font-mono text-[15px] font-medium leading-snug text-link">
+              {shortUrl}
+            </span>
             <button
               type="button"
               onClick={() => {

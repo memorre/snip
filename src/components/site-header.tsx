@@ -98,7 +98,7 @@ export function SiteHeader() {
             </DropdownMenu>
           ) : status === "loading" ? (
             <span className="ml-1 h-7 w-7" aria-hidden="true" />
-          ) : (
+          ) : pathname === "/login" ? null : (
             <Button asChild size="nav" className="ml-1.5">
               <Link href="/login">{t("nav.signIn")}</Link>
             </Button>

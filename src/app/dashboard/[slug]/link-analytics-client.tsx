@@ -147,7 +147,7 @@ export function LinkAnalyticsClient({ link, initialStats }: { link: LinkMeta; in
             <Stat label={t("analytics.stats.clicks", { count: days })} value={fmt.number(stats.totalClicks)} />
             <Stat
               label={t("analytics.stats.average")}
-              value={fmt.number(average, { maximumFractionDigits: 1 })}
+              value={fmt.number(average, { maximumFractionDigits: average > 0 && average < 1 ? 2 : 1 })}
             />
             <Stat
               label={t("analytics.stats.created")}
@@ -211,7 +211,7 @@ export function LinkAnalyticsClient({ link, initialStats }: { link: LinkMeta; in
             </div>
           </Card>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Devices */}
             <Card className="p-5 sm:p-6">
               <h2 className="mb-4 text-[17px] font-semibold tracking-tight">{t("analytics.devices")}</h2>
@@ -290,7 +290,7 @@ export function LinkAnalyticsClient({ link, initialStats }: { link: LinkMeta; in
             />
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
             <RecentClicks recent={stats.recent} connected={connected} />
             <Card className="flex flex-col items-center p-6 text-center">
               <h2 className="text-[17px] font-semibold tracking-tight">{t("analytics.qr.title")}</h2>

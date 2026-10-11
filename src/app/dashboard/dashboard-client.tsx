@@ -160,7 +160,9 @@ export function DashboardClient({
               <DialogHeader className="pr-0">
                 <DialogTitle className="break-all">{t("dashboard.confirmDelete.title", { slug: pendingDelete.slug })}</DialogTitle>
                 <DialogDescription>
-                  {t("dashboard.confirmDelete.body", { count: pendingDelete.totalClicks })}
+                  {pendingDelete.totalClicks === 0
+                    ? t("dashboard.confirmDelete.bodyNoClicks")
+                    : t("dashboard.confirmDelete.body", { count: pendingDelete.totalClicks })}
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>

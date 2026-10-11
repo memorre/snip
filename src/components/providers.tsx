@@ -5,14 +5,16 @@ import { ThemeProvider, useTheme } from "next-themes";
 import { SessionProvider } from "next-auth/react";
 import { MotionConfig } from "motion/react";
 import { Toaster } from "sonner";
-import { I18nProvider } from "@/i18n/client";
+import { I18nProvider, useT } from "@/i18n/client";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/types";
 
 function AppToaster() {
   const { resolvedTheme } = useTheme();
+  const t = useT();
   return (
     <Toaster
+      containerAriaLabel={t("common.notifications")}
       position="top-center"
       offset={60}
       theme={resolvedTheme === "dark" ? "dark" : "light"}

@@ -12,7 +12,7 @@ browser breakdowns, geography, and a live click ticker that updates the dashboar
 | Styling | Tailwind CSS v4 + hand-rolled Radix UI primitives | Apple-style tokens shared with [yetao.org](https://yetao.org): system font stack, #f5f5f7 grouped backgrounds, frosted nav and menus, pill buttons, light/dark. |
 | i18n | Typed dictionaries + a small translator (no framework) | Simplified Chinese, English, French and Spanish; locale from a `lang` cookie shared across yetao.org, then `Accept-Language`. |
 | Animation | Motion (Framer Motion) | Page transitions, list reveals, animated chart containers. |
-| Charts | Recharts | Daily trend area chart, device donut chart. |
+| Charts | Recharts | Daily trend bar chart, device donut chart. |
 | Data | Prisma ORM 7 + Postgres (Prisma Postgres via Vercel Marketplace) | Same database for local dev and production. |
 | Auth | Auth.js (NextAuth v5), credentials + JWT sessions | Single demo account; ownership-based access control (no roles needed — every user only ever sees their own links). |
 | Real-time | Server-Sent Events + in-memory pub/sub, with SWR polling as a fallback | Click events push to the dashboard instantly within a single instance; documented upgrade path for horizontal scale below. |

@@ -85,14 +85,14 @@ async function main() {
   const LINKS = [
     {
       slug: "launch",
-      title: "Timetabler launch post",
+      title: "Timetable launch post",
       targetUrl: "https://github.com/memorre/class-timetabler-platform",
       clicks: 210,
       days: 30,
     },
     {
       slug: "demo",
-      title: "Timetabler live demo",
+      title: "Timetable live demo",
       targetUrl: "https://timetable.yetao.org",
       clicks: 130,
       days: 21,

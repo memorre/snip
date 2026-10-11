@@ -23,6 +23,7 @@ export const fr: Dictionary = {
     loading: "Chargement…",
     justNow: "à l’instant",
     optional: "Facultatif",
+    notifications: "Notifications",
   },
 
   nav: {
@@ -134,11 +135,12 @@ export const fr: Dictionary = {
     confirmDelete: {
       title: "Supprimer /{slug} ?",
       body: {
-        one: "Le lien cessera immédiatement de fonctionner et {count} clic enregistré sera supprimé avec lui. Cette action est irréversible.",
+        one: "Le lien cessera immédiatement de fonctionner et le clic enregistré sera supprimé avec lui. Cette action est irréversible.",
         many: "Le lien cessera immédiatement de fonctionner et ses {count} de clics enregistrés seront supprimés avec lui. Cette action est irréversible.",
         other:
           "Le lien cessera immédiatement de fonctionner et ses {count} clics enregistrés seront supprimés avec lui. Cette action est irréversible.",
       },
+      bodyNoClicks: "Le lien cessera immédiatement de fonctionner. Cette action est irréversible.",
       confirm: "Supprimer",
     },
   },

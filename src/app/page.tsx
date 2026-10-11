@@ -79,7 +79,7 @@ export default function Home() {
             </h2>
           </Reveal>
 
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 [&>.reveal]:h-full">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 [&>.reveal]:h-full">
             {FEATURES.map((f, i) => (
               <Reveal key={f.id} delay={(i % 3) * 90}>
                 <article className="flex h-full flex-col rounded-[28px] bg-surface p-7 shadow-[var(--card-shadow)] transition-[transform,box-shadow] duration-500 ease-[var(--ease)] hover:scale-[1.015] hover:shadow-[var(--card-shadow-hover)] sm:p-8">

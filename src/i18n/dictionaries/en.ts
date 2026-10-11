@@ -22,6 +22,7 @@ export const en = {
     loading: "Loading…",
     justNow: "just now",
     optional: "Optional",
+    notifications: "Notifications",
   },
 
   nav: {
@@ -137,6 +138,7 @@ export const en = {
         other:
           "The link stops working right away, and its {count} recorded clicks are deleted with it. This can’t be undone.",
       },
+      bodyNoClicks: "The link stops working right away. This can’t be undone.",
       confirm: "Delete",
     },
   },

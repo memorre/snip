@@ -21,6 +21,7 @@ export const zhCN: Dictionary = {
     loading: "正在加载…",
     justNow: "刚刚",
     optional: "选填",
+    notifications: "通知",
   },
 
   nav: {
@@ -84,7 +85,7 @@ export const zhCN: Dictionary = {
   login: {
     title: "登录 Snip",
     subtitle: "创建短链接，实时查看每一次点击。",
-    email: "电子邮件",
+    email: "邮箱",
     emailPlaceholder: "name@example.com",
     password: "密码",
     submit: "登录",
@@ -132,6 +133,7 @@ export const zhCN: Dictionary = {
     confirmDelete: {
       title: "删除 /{slug}？",
       body: { other: "链接会立即失效，已记录的 {count} 次点击也将一并删除。此操作无法撤销。" },
+      bodyNoClicks: "链接会立即失效。此操作无法撤销。",
       confirm: "删除",
     },
   },
@@ -171,7 +173,7 @@ export const zhCN: Dictionary = {
     disabled: "已停用",
     summary: "概览",
     stats: {
-      clicks: { other: "近 {count} 天点击量" },
+      clicks: { other: "{count} 天点击量" },
       average: "日均点击",
       created: "创建时间",
     },

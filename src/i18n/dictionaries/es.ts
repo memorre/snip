@@ -22,6 +22,7 @@ export const es: Dictionary = {
     loading: "Cargando…",
     justNow: "hace un momento",
     optional: "Opcional",
+    notifications: "Notificaciones",
   },
 
   nav: {
@@ -133,11 +134,12 @@ export const es: Dictionary = {
     confirmDelete: {
       title: "¿Eliminar /{slug}?",
       body: {
-        one: "El enlace dejará de funcionar de inmediato y también se eliminará su {count} clic registrado. Esta acción no se puede deshacer.",
+        one: "El enlace dejará de funcionar de inmediato y también se eliminará el clic registrado. Esta acción no se puede deshacer.",
         many: "El enlace dejará de funcionar de inmediato y también se eliminarán sus {count} de clics registrados. Esta acción no se puede deshacer.",
         other:
           "El enlace dejará de funcionar de inmediato y también se eliminarán sus {count} clics registrados. Esta acción no se puede deshacer.",
       },
+      bodyNoClicks: "El enlace dejará de funcionar de inmediato. Esta acción no se puede deshacer.",
       confirm: "Eliminar",
     },
   },
@@ -177,7 +179,7 @@ export const es: Dictionary = {
     disabled: "Desactivado",
     summary: "Resumen",
     stats: {
-      clicks: { one: "Clics del último día", other: "Clics de los últimos {count} días" },
+      clicks: { one: "Clics en el último día", other: "Clics en {count} días" },
       average: "Promedio diario",
       created: "Creado",
     },
