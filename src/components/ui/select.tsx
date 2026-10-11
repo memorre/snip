@@ -16,7 +16,7 @@ export function SelectTrigger({
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        "flex h-10 items-center justify-between gap-2 rounded-xl border border-border bg-surface px-3.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring data-[placeholder]:text-muted",
+        "flex h-11 items-center justify-between gap-2 rounded-xl border border-border bg-surface px-3.5 text-[16px] outline-none transition-[border-color,box-shadow] focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-ring focus-visible:outline-none data-[placeholder]:text-muted sm:text-[15px]",
         className
       )}
       {...props}
@@ -38,14 +38,14 @@ export function SelectContent({
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
         className={cn(
-          "z-50 overflow-hidden rounded-xl border border-border bg-surface shadow-xl animate-in fade-in-0 zoom-in-95",
+          "frosted z-50 overflow-hidden rounded-[14px] shadow-[var(--popover-shadow)] data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-[0.97]",
           className
         )}
         position="popper"
         sideOffset={6}
         {...props}
       >
-        <SelectPrimitive.Viewport className="p-1">{children}</SelectPrimitive.Viewport>
+        <SelectPrimitive.Viewport className="p-1.5">{children}</SelectPrimitive.Viewport>
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
   );
@@ -59,14 +59,14 @@ export function SelectItem({
   return (
     <SelectPrimitive.Item
       className={cn(
-        "relative flex cursor-pointer select-none items-center rounded-lg py-2 pl-8 pr-3 text-sm outline-none data-[highlighted]:bg-surface-2 data-[state=checked]:text-primary",
+        "relative flex cursor-default select-none items-center rounded-[8px] py-1.5 pl-8 pr-3 text-[14px] outline-none data-[highlighted]:bg-primary data-[highlighted]:text-primary-foreground max-sm:py-2.5",
         className
       )}
       {...props}
     >
-      <span className="absolute left-2.5 flex h-3.5 w-3.5 items-center justify-center">
+      <span className="absolute left-2.5 flex h-4 w-4 items-center justify-center text-current">
         <SelectPrimitive.ItemIndicator>
-          <Check className="h-3.5 w-3.5" />
+          <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>

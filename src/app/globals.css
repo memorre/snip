@@ -3,54 +3,127 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Apple-style tokens, shared with yetao.org. Light first, then dark (next-themes toggles .dark). */
 :root {
-  --background: #f6f7fb;
-  --background-alt: #eef1f9;
+  color-scheme: light;
+
+  --background: #ffffff;
+  --background-alt: #f5f5f7;
   --surface: #ffffff;
-  --surface-2: #f3f4fa;
-  --border: #e2e5f0;
-  --foreground: #12141f;
-  --muted: #656b80;
+  --surface-2: #f5f5f7;
+  --fill: #e8e8ed;
+  --fill-hover: #dcdce1;
+  --border: #d2d2d7;
+  --separator: rgba(0, 0, 0, 0.08);
+  --foreground: #1d1d1f;
+  --muted: #6e6e73;
+  --muted-2: #86868b;
 
-  --primary: #4f46e5;
+  --primary: #0071e3;
+  --primary-hover: #0077ed;
   --primary-foreground: #ffffff;
-  --primary-soft: #ecebfd;
+  --primary-soft: rgba(0, 113, 227, 0.1);
+  --link: #0066cc;
 
-  --accent: #0e7490;
-  --accent-soft: #e0f6fa;
+  /* Text and icon red, AA on white and on --danger-soft. Filled buttons use --danger-fill. */
+  --danger: #d70015;
+  --danger-fill: #d70015;
+  --danger-soft: rgba(255, 59, 48, 0.1);
+  --warning: #b25000;
+  --warning-soft: rgba(255, 159, 10, 0.14);
+  --success: #1d7a33;
+  --success-soft: rgba(52, 199, 89, 0.14);
+  --live: #34c759;
 
-  --danger: #e5484d;
-  --danger-soft: #fde9e9;
-  --warning: #d97706;
-  --warning-soft: #fdf1de;
-  --success: #16a34a;
-  --success-soft: #e4f6eb;
+  /* Apple system colours for charts */
+  --chart-blue: #0071e3;
+  --chart-teal: #30b0c7;
+  --chart-green: #34c759;
+  --chart-orange: #ff9f0a;
+  --chart-pink: #ff2d55;
+  --chart-purple: #af52de;
 
-  --ring: color-mix(in srgb, var(--primary) 55%, transparent);
+  --ring: rgba(0, 113, 227, 0.25);
+  --nav-bg: rgba(255, 255, 255, 0.72);
+  --nav-line: rgba(0, 0, 0, 0.08);
+  --popover: rgba(255, 255, 255, 0.82);
+  --seg-bg: rgba(118, 118, 128, 0.12);
+  --seg-thumb: #ffffff;
+  /* Inactive segment and quiet-pill text: AA on the grey track and on --fill */
+  --seg-text: #636366;
+  --switch-off: #e9e9eb;
+
+  --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.1);
+  --popover-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  --hero-shadow: 0 30px 80px -24px rgba(0, 0, 0, 0.22), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+
+  --gradient-snip: linear-gradient(90deg, #ff9f0a 0%, #ff2d55 55%, #af52de 100%);
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Latin text gets Apple's slightly tight tracking; Chinese gets none (see [lang|="zh"] below). */
+  --tracking-body: -0.01em;
+  --tracking-headline: -0.015em;
 }
 
 .dark {
-  --background: #0a0b12;
-  --background-alt: #0e0f1a;
-  --surface: #12131f;
-  --surface-2: #171827;
-  --border: #26284060;
-  --foreground: #eef0fb;
-  --muted: #9498ad;
+  color-scheme: dark;
 
-  --primary: #818cf8;
-  --primary-foreground: #0a0b12;
-  --primary-soft: #23244a;
+  --background: #000000;
+  --background-alt: #0b0b0c;
+  --surface: #1c1c1e;
+  --surface-2: #2c2c2e;
+  --fill: #2c2c2e;
+  --fill-hover: #3a3a3c;
+  --border: #424245;
+  --separator: rgba(255, 255, 255, 0.1);
+  --foreground: #f5f5f7;
+  --muted: #a1a1a6;
+  --muted-2: #86868b;
 
-  --accent: #22d3ee;
-  --accent-soft: #0e2f36;
+  --primary: #0071e3;
+  --primary-hover: #0077ed;
+  --primary-foreground: #ffffff;
+  --primary-soft: rgba(10, 132, 255, 0.18);
+  --link: #2997ff;
 
-  --danger: #f47174;
-  --danger-soft: #3a1a1c;
-  --warning: #f7bb62;
-  --warning-soft: #3a2c12;
-  --success: #4cd087;
-  --success-soft: #113321;
+  --danger: #ff6961;
+  --danger-fill: #d70015;
+  --danger-soft: rgba(255, 69, 58, 0.16);
+  --warning: #ff9f0a;
+  --warning-soft: rgba(255, 159, 10, 0.16);
+  --success: #30d158;
+  --success-soft: rgba(48, 209, 88, 0.16);
+  --live: #30d158;
+
+  --chart-blue: #0a84ff;
+  --chart-teal: #40c8e0;
+  --chart-green: #30d158;
+  --chart-orange: #ff9f0a;
+  --chart-pink: #ff375f;
+  --chart-purple: #bf5af2;
+
+  --ring: rgba(10, 132, 255, 0.35);
+  --nav-bg: rgba(22, 22, 23, 0.72);
+  --nav-line: rgba(255, 255, 255, 0.08);
+  --popover: rgba(36, 36, 38, 0.82);
+  --seg-bg: rgba(118, 118, 128, 0.24);
+  --seg-thumb: #636366;
+  --seg-text: #a1a1a6;
+  --switch-off: #39393d;
+
+  --card-shadow: none;
+  --card-shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.6);
+  --popover-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(255, 255, 255, 0.14);
+  --hero-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.12);
+
+  --gradient-snip: linear-gradient(90deg, #ffb340 0%, #ff375f 55%, #bf5af2 100%);
+}
+
+[lang|="zh"] {
+  --tracking-body: 0;
+  --tracking-headline: 0;
+  letter-spacing: 0;
 }
 
 @theme inline {
@@ -58,72 +131,163 @@
   --color-background-alt: var(--background-alt);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-fill: var(--fill);
+  --color-fill-hover: var(--fill-hover);
   --color-border: var(--border);
+  --color-separator: var(--separator);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
 
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary-soft: var(--primary-soft);
-
-  --color-accent: var(--accent);
-  --color-accent-soft: var(--accent-soft);
+  --color-link: var(--link);
 
   --color-danger: var(--danger);
+  --color-danger-fill: var(--danger-fill);
   --color-danger-soft: var(--danger-soft);
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
+  --color-live: var(--live);
 
   --color-ring: var(--ring);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Segoe UI", "Microsoft YaHei",
+    "Noto Sans SC", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.75rem;
+  /* tracking-tight follows the locale: tight for Latin headlines, none for Chinese */
+  --tracking-tight: var(--tracking-headline);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 56px;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.47059;
+    letter-spacing: var(--tracking-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Chinese only wraps at punctuation, spaces or a zero-width space, never in the middle of a word. */
+  :lang(zh) :is(h1, h2, h3, .headline) {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 28%, transparent);
+  }
 }
 
-* {
-  border-color: var(--border);
+/* Frosted navigation bar, as on yetao.org */
+@utility glass {
+  background: var(--nav-bg);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
 }
 
-::selection {
-  background: var(--primary);
-  color: var(--primary-foreground);
+/* Frosted popovers: menus, chart tooltips, toasts */
+@utility frosted {
+  background: var(--popover);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
 }
 
-.glass {
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+@utility text-gradient-snip {
+  background: var(--gradient-snip);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.bg-mesh {
-  background-image:
-    radial-gradient(at 15% 0%, color-mix(in srgb, var(--primary) 22%, transparent) 0px, transparent 55%),
-    radial-gradient(at 85% 8%, color-mix(in srgb, var(--accent) 20%, transparent) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, color-mix(in srgb, var(--primary) 12%, transparent) 0px, transparent 60%);
+/* Snip's app icon: the same tile as the project card on yetao.org */
+@utility app-icon {
+  background: linear-gradient(145deg, #ffb340 0%, #ff2d55 100%);
+  color: #ffffff;
+  box-shadow:
+    0 4px 12px rgba(255, 45, 85, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* "Learn more ›" style chevron after a text link */
+@utility chevron-after {
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 0.4em;
+    height: 0.4em;
+    margin-left: 0.3em;
+    border-top: 1.6px solid currentColor;
+    border-right: 1.6px solid currentColor;
+    transform: translateY(-0.1em) rotate(45deg);
+  }
+}
+
+/* Hero entrance, CSS-only so the page is visible before JavaScript loads */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+@utility animate-rise {
+  animation: rise 1s var(--ease) both;
+}
+
+/* Scroll reveal (see components/reveal.tsx); only hidden once JavaScript has run */
+.reveal {
+  transition:
+    opacity 1s var(--ease),
+    transform 1s var(--ease);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal[data-reveal="hidden"] {
+  opacity: 0;
+  transform: translateY(40px);
 }
 
 @keyframes pulse-ring {
   0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 55%, transparent);
   }
   100% {
-    box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent);
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--live) 0%, transparent);
   }
 }
 
-.animate-pulse-ring {
+@utility animate-pulse-ring {
   animation: pulse-ring 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 

@@ -4,43 +4,65 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
-import { isValidSlug, randomSlug } from "@/lib/slug";
+import { isReservedSlug, isValidSlug, randomSlug } from "@/lib/slug";
+import type { MessageKey, MessageVars } from "@/i18n/types";
 
-export type ActionState = { error?: string; success?: boolean; slug?: string } | undefined;
+type CreateLinkValues = { targetUrl: string; slug: string; title: string };
+
+export type ActionState =
+  | {
+      /**
+       * A message key (plus its variables), not rendered text, so the form shows the error in
+       * whatever language is active, even after a language switch.
+       */
+      errorKey?: MessageKey;
+      errorVars?: MessageVars;
+      /** The field the error is about, so the form can mark just that input. */
+      field?: "targetUrl" | "slug";
+      /** What was submitted, so the form can keep it after React resets it. */
+      values?: CreateLinkValues;
+      success?: boolean;
+      slug?: string;
+    }
+  | undefined;
+
+const optionalText = z
+  .string()
+  .trim()
+  .transform((v) => (v.length === 0 ? undefined : v))
+  .optional();
 
 const createSchema = z.object({
-  targetUrl: z.string().url("Enter a valid URL, including https://"),
-  slug: z
-    .string()
-    .trim()
-    .transform((v) => (v.length === 0 ? undefined : v))
-    .optional(),
-  title: z
-    .string()
-    .trim()
-    .transform((v) => (v.length === 0 ? undefined : v))
-    .optional(),
+  targetUrl: z.string().url(),
+  slug: optionalText,
+  title: optionalText,
 });
 
 export async function createLink(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireUser();
 
-  const parsed = createSchema.safeParse({
-    targetUrl: formData.get("targetUrl"),
-    slug: formData.get("slug"),
-    title: formData.get("title"),
-  });
+  const values: CreateLinkValues = {
+    targetUrl: String(formData.get("targetUrl") ?? ""),
+    slug: String(formData.get("slug") ?? ""),
+    title: String(formData.get("title") ?? ""),
+  };
+
+  const parsed = createSchema.safeParse(values);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    const urlIssue = parsed.error.issues[0]?.path[0] === "targetUrl";
+    return {
+      errorKey: urlIssue ? "errors.invalidUrl" : "errors.invalidInput",
+      field: urlIssue ? "targetUrl" : undefined,
+      values,
+    };
   }
 
   let { slug } = parsed.data;
   if (slug) {
-    if (!isValidSlug(slug)) {
-      return { error: "Slugs must be 3-32 characters: letters, numbers, - and _ only." };
-    }
+    if (isReservedSlug(slug)) return { errorKey: "errors.slugReserved", errorVars: { slug }, field: "slug", values };
+    if (!isValidSlug(slug)) return { errorKey: "errors.slugFormat", field: "slug", values };
     const existing = await prisma.link.findUnique({ where: { slug } });
-    if (existing) return { error: `"${slug}" is already taken.` };
+    if (existing) return { errorKey: "errors.slugTaken", errorVars: { slug }, field: "slug", values };
   } else {
     do {
       slug = randomSlug();

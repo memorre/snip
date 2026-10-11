@@ -3,31 +3,33 @@
 import * as React from "react";
 import QRCode from "qrcode";
 import { Download } from "lucide-react";
+import { useT } from "@/i18n/client";
 import { Button } from "@/components/ui/button";
 
-export function QrCodeCard({ value, filename }: { value: string; filename: string }) {
+/** QR code for the short URL; `value` is null until the page knows its own origin. */
+export function QrCodeCard({ value, filename }: { value: string | null; filename: string }) {
+  const t = useT();
   const [dataUrl, setDataUrl] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    if (!value) return;
     let cancelled = false;
-    QRCode.toDataURL(value, { width: 240, margin: 1, color: { dark: "#12141f", light: "#ffffff" } }).then(
-      (url) => {
-        if (!cancelled) setDataUrl(url);
-      }
-    );
+    QRCode.toDataURL(value, { width: 480, margin: 1, color: { dark: "#1d1d1f", light: "#ffffff" } }).then((url) => {
+      if (!cancelled) setDataUrl(url);
+    });
     return () => {
       cancelled = true;
     };
   }, [value]);
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="flex h-[168px] w-[168px] items-center justify-center overflow-hidden rounded-xl border border-border bg-white p-2">
+    <div className="flex flex-col items-center gap-4">
+      <div className="flex h-[168px] w-[168px] items-center justify-center overflow-hidden rounded-[18px] bg-white p-2.5 shadow-[0_0_0_0.5px_rgba(0,0,0,0.08)]">
         {dataUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={dataUrl} alt="QR code" className="h-full w-full" />
+          <img src={dataUrl} alt={t("analytics.qr.alt", { url: value ?? "" })} className="h-full w-full" />
         ) : (
-          <div className="h-full w-full animate-pulse rounded-lg bg-surface-2" />
+          <div className="h-full w-full animate-pulse rounded-lg bg-[#f5f5f7]" role="status" aria-label={t("common.loading")} />
         )}
       </div>
       <Button
@@ -42,7 +44,8 @@ export function QrCodeCard({ value, filename }: { value: string; filename: strin
           a.click();
         }}
       >
-        <Download className="h-3.5 w-3.5" /> Download QR
+        <Download className="h-3.5 w-3.5" />
+        {t("analytics.qr.download")}
       </Button>
     </div>
   );

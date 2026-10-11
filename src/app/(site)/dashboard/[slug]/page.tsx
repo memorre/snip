@@ -1,7 +1,16 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/session";
+import { getCurrentUser, requireUser } from "@/lib/session";
 import { getLinkForOwner, getLinkStats } from "@/lib/data";
+import { getT } from "@/i18n/server";
 import { LinkAnalyticsClient } from "./link-analytics-client";
+
+export async function generateMetadata({ params }: PageProps<"/dashboard/[slug]">): Promise<Metadata> {
+  const [{ slug }, t, user] = await Promise.all([params, getT(), getCurrentUser()]);
+  // A missing or someone else's link gets the 404 title, matching the not-found page the visitor sees.
+  const link = user ? await getLinkForOwner(slug, user.id) : null;
+  return { title: link ? t("meta.analytics", { slug }) : t("meta.notFound") };
+}
 
 export default async function LinkAnalyticsPage({ params }: PageProps<"/dashboard/[slug]">) {
   const user = await requireUser();

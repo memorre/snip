@@ -1,37 +1,32 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { Providers } from "@/components/providers";
-import { SiteHeader } from "@/components/site-header";
+import { getLocale, getT } from "@/i18n/server";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return {
+    title: { default: t("meta.title"), template: "%s · Snip" },
+    description: t("meta.description"),
+    applicationName: "Snip",
+  };
+}
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Snip — Short Links with Real Analytics",
-  description: "Create short links and watch clicks land in real time — referrers, devices, and geography.",
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // Resolved per request from the "lang" cookie, then Accept-Language, so the first paint is already
+  // in the right language. The UI shell (providers, nav, dictionary) is added by app/(site)/layout.tsx
+  // and app/not-found.tsx, so the /[slug] redirect route does no more than read the locale.
+  const locale = await getLocale();
+
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
-        <Providers>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-        </Providers>
-      </body>
+    <html lang={locale} suppressHydrationWarning className="h-full">
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

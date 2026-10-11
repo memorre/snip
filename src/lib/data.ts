@@ -1,4 +1,6 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { DIRECT_REFERRER, UNKNOWN_LABEL } from "@/lib/stats-labels";
 
 export async function listLinksForUser(userId: string) {
   const links = await prisma.link.findMany({
@@ -29,9 +31,10 @@ export async function listLinksForUser(userId: string) {
 
 export type LinkSummaryDTO = Awaited<ReturnType<typeof listLinksForUser>>[number];
 
-export async function getLinkForOwner(slug: string, ownerId: string) {
+/** Memoised per request, so a page and its generateMetadata share one query. */
+export const getLinkForOwner = cache(async (slug: string, ownerId: string) => {
   return prisma.link.findFirst({ where: { slug, ownerId } });
-}
+});
 
 export async function getActiveLinkBySlug(slug: string) {
   const link = await prisma.link.findUnique({ where: { slug } });
@@ -83,17 +86,24 @@ export async function getLinkStats(linkId: string, days = 30) {
   const osCounts = new Map<string, number>();
   const deviceCounts = new Map<string, number>();
   const countryCounts = new Map<string, number>();
+  const cityCounts = new Map<string, { city: string; country: string | null; count: number }>();
 
   for (const c of clicks) {
     const ref = refLabel(c.referrer);
     referrerCounts.set(ref, (referrerCounts.get(ref) ?? 0) + 1);
-    const browser = c.browser ?? "Unknown";
+    const browser = c.browser ?? UNKNOWN_LABEL;
     browserCounts.set(browser, (browserCounts.get(browser) ?? 0) + 1);
-    const os = c.os ?? "Unknown";
+    const os = c.os ?? UNKNOWN_LABEL;
     osCounts.set(os, (osCounts.get(os) ?? 0) + 1);
     deviceCounts.set(c.deviceType, (deviceCounts.get(c.deviceType) ?? 0) + 1);
-    const country = c.country ?? "Unknown";
+    const country = c.country ?? UNKNOWN_LABEL;
     countryCounts.set(country, (countryCounts.get(country) ?? 0) + 1);
+    if (c.city) {
+      const key = `${c.country ?? ""}|${c.city}`;
+      const entry = cityCounts.get(key) ?? { city: c.city, country: c.country, count: 0 };
+      entry.count += 1;
+      cityCounts.set(key, entry);
+    }
   }
 
   return {
@@ -104,11 +114,14 @@ export async function getLinkStats(linkId: string, days = 30) {
     byOs: topEntries(osCounts),
     byDevice: topEntries(deviceCounts),
     byCountry: topEntries(countryCounts, 8),
+    byCity: Array.from(cityCounts.values())
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8),
     recent: clicks.slice(0, 12).map((c) => ({
       createdAt: c.createdAt.toISOString(),
       referrer: refLabel(c.referrer),
-      browser: c.browser ?? "Unknown",
-      os: c.os ?? "Unknown",
+      browser: c.browser ?? UNKNOWN_LABEL,
+      os: c.os ?? UNKNOWN_LABEL,
       deviceType: c.deviceType,
       country: c.country,
       city: c.city,
@@ -119,7 +132,7 @@ export async function getLinkStats(linkId: string, days = 30) {
 export type LinkStatsDTO = Awaited<ReturnType<typeof getLinkStats>>;
 
 function refLabel(referrer: string | null) {
-  if (!referrer) return "Direct";
+  if (!referrer) return DIRECT_REFERRER;
   try {
     return new URL(referrer).hostname.replace(/^www\./, "");
   } catch {
