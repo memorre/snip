@@ -70,7 +70,7 @@ function useLabels() {
 export function LinkAnalyticsClient({ link, initialStats }: { link: LinkMeta; initialStats: Stats }) {
   const { t, fmt } = useI18n();
   const labels = useLabels();
-  const { connected } = useLiveClicks(link.slug, { announceToasts: true });
+  const { connected } = useLiveClicks(link.slug, { linkId: initialStats.linkId, announceToasts: true });
   const [days, setDays] = React.useState(30);
   const [origin, setOrigin] = React.useState("");
   React.useEffect(() => {
