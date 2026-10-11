@@ -4,12 +4,12 @@ import type { Dictionary } from "../types";
 
 export const es: Dictionary = {
   meta: {
-    title: "Snip — Enlaces cortos con analíticas reales",
+    title: "Snip — Enlaces cortos con analítica real",
     description:
-      "Crea enlaces cortos y ve llegar cada clic en tiempo real, con el origen, el dispositivo, el navegador y la ubicación de cada enlace.",
+      "Crea enlaces cortos y ve llegar cada clic en tiempo real, con la fuente, el dispositivo, el navegador y la ubicación de cada enlace.",
     login: "Iniciar sesión",
     dashboard: "Panel",
-    analytics: "Analíticas de /{slug}",
+    analytics: "Analítica de /{slug}",
     notFound: "Enlace no encontrado",
   },
 
@@ -34,34 +34,34 @@ export const es: Dictionary = {
   },
 
   landing: {
-    eyebrow: "Acortador de enlaces con analíticas en vivo",
+    eyebrow: "Enlaces cortos con analítica en tiempo real",
     taglineLead: "Cada clic,",
     taglineAccent: "en tiempo real",
     lead: "Snip convierte una URL larga en un enlace corto y te muestra quién hizo clic, desde dónde y con qué dispositivo, en el momento en que ocurre.",
     ctaPrimary: "Comenzar",
     ctaDemo: "Probar la demo",
     preview: {
-      label: "Ejemplo de analíticas en vivo de un enlace",
+      label: "Ejemplo de analítica en tiempo real de un enlace",
       live: "En vivo",
       clicksToday: "Clics de hoy",
-      topReferrer: "Origen principal",
+      topReferrer: "Fuente principal",
       topCountry: "País principal",
       lastWeek: "Últimos 7 días",
     },
     featuresTitle: "Todo lo que necesita un enlace corto",
-    featuresSubtitle: "Con analíticas reales integradas",
+    featuresSubtitle: "Con analítica real integrada",
     features: {
       links: {
         title: "Enlaces cortos y limpios",
         body: "Elige un alias fácil de recordar o deja que Snip genere uno. La redirección tarda apenas milisegundos.",
       },
       analytics: {
-        title: "Analíticas de verdad",
-        body: "Tendencia diaria, orígenes, dispositivos, navegadores y sistemas operativos de cada enlace, no solo un contador de clics.",
+        title: "Analítica de verdad",
+        body: "Tendencia diaria, fuentes, dispositivos, navegadores y sistemas operativos de cada enlace, no solo un contador de clics.",
       },
       live: {
         title: "Clics en vivo",
-        body: "Deja abiertas las analíticas de un enlace y verás llegar cada clic al instante, sin recargar la página.",
+        body: "Deja abierta la analítica de un enlace y verás llegar cada clic al instante, sin recargar la página.",
       },
       geo: {
         title: "Países y ciudades",
@@ -97,13 +97,14 @@ export const es: Dictionary = {
     back: "Volver al inicio",
     features: {
       instant: "Redirecciones instantáneas con seguimiento de clics en vivo",
-      breakdowns: "Desglose por origen, dispositivo y ubicación",
+      breakdowns: "Desglose por fuente, dispositivo y ubicación",
       qr: "Un código QR descargable para cada enlace",
     },
     errors: {
       invalid: "El correo electrónico o la contraseña no son correctos.",
       demo: "No se pudo iniciar sesión con la cuenta de demostración. Inténtalo de nuevo.",
       generic: "Algo salió mal. Inténtalo de nuevo.",
+      missing: "Escribe tu correo electrónico y tu contraseña.",
     },
   },
 
@@ -121,10 +122,10 @@ export const es: Dictionary = {
     clicks: { one: "{count} clic", many: "{count} de clics", other: "{count} clics" },
     created: "Creado {time}",
     createdJustNow: "Creado hace un momento",
-    analytics: "Estadísticas",
+    analytics: "Analítica",
     copy: "Copiar enlace",
     copied: "Enlace copiado",
-    toggle: "Enlace activado",
+    toggle: "Activar enlace",
     delete: "Eliminar enlace",
     deleted: "Se eliminó /{slug}",
     empty: {
@@ -170,6 +171,9 @@ export const es: Dictionary = {
     slugTaken: "“{slug}” ya está en uso.",
     unauthorized: "Inicia sesión para continuar.",
     notFound: "No se encontró el enlace.",
+    unexpectedTitle: "Algo salió mal",
+    unexpectedBody: "Inténtalo de nuevo en un momento.",
+    retry: "Reintentar",
   },
 
   analytics: {
@@ -179,9 +183,9 @@ export const es: Dictionary = {
     disabled: "Desactivado",
     summary: "Resumen",
     stats: {
-      clicks: { one: "Clics en el último día", other: "Clics en {count} días" },
+      clicks: { one: "Clics en el último día", other: "Clics en los últimos {count} días" },
       average: "Promedio diario",
-      created: "Creado",
+      created: "Fecha de creación",
     },
     chart: {
       title: "Evolución de los clics",
@@ -197,7 +201,7 @@ export const es: Dictionary = {
       tablet: "Tableta",
       otherDevice: "Otro",
     },
-    referrers: "Principales orígenes",
+    referrers: "Principales fuentes",
     browsers: "Navegadores",
     os: "Sistemas operativos",
     countries: "Países y regiones",

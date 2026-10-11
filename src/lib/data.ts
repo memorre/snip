@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { DIRECT_REFERRER, UNKNOWN_LABEL } from "@/lib/stats-labels";
 
@@ -30,9 +31,10 @@ export async function listLinksForUser(userId: string) {
 
 export type LinkSummaryDTO = Awaited<ReturnType<typeof listLinksForUser>>[number];
 
-export async function getLinkForOwner(slug: string, ownerId: string) {
+/** Memoised per request, so a page and its generateMetadata share one query. */
+export const getLinkForOwner = cache(async (slug: string, ownerId: string) => {
   return prisma.link.findFirst({ where: { slug, ownerId } });
-}
+});
 
 export async function getActiveLinkBySlug(slug: string) {
   const link = await prisma.link.findUnique({ where: { slug } });

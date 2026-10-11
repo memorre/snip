@@ -30,8 +30,9 @@ export function DropdownMenuContent({
   );
 }
 
+/** Highlighted (hovered or keyboard-focused) items turn Apple blue with white text, like macOS menus. */
 const itemClass =
-  "relative flex cursor-default select-none items-center gap-2.5 rounded-[8px] px-2.5 py-1.5 text-[14px] outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-fill max-sm:py-2.5 [&_svg]:shrink-0";
+  "group relative flex cursor-default select-none items-center gap-2.5 rounded-[8px] px-2.5 py-1.5 text-[14px] outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-primary data-[highlighted]:text-primary-foreground max-sm:py-2.5 [&_svg]:shrink-0";
 
 export function DropdownMenuItem({
   className,
@@ -48,7 +49,7 @@ export function DropdownMenuRadioItem({
 }: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>) {
   return (
     <DropdownMenuPrimitive.RadioItem className={cn(itemClass, "pl-8", className)} {...props}>
-      <span className="absolute left-2.5 flex h-4 w-4 items-center justify-center text-link">
+      <span className="absolute left-2.5 flex h-4 w-4 items-center justify-center text-current">
         <DropdownMenuPrimitive.ItemIndicator>
           <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
         </DropdownMenuPrimitive.ItemIndicator>

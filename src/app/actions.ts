@@ -5,13 +5,18 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { isReservedSlug, isValidSlug, randomSlug } from "@/lib/slug";
-import { getT } from "@/i18n/server";
+import type { MessageKey, MessageVars } from "@/i18n/types";
 
 type CreateLinkValues = { targetUrl: string; slug: string; title: string };
 
 export type ActionState =
   | {
-      error?: string;
+      /**
+       * A message key (plus its variables), not rendered text, so the form shows the error in
+       * whatever language is active, even after a language switch.
+       */
+      errorKey?: MessageKey;
+      errorVars?: MessageVars;
       /** The field the error is about, so the form can mark just that input. */
       field?: "targetUrl" | "slug";
       /** What was submitted, so the form can keep it after React resets it. */
@@ -35,8 +40,6 @@ const createSchema = z.object({
 
 export async function createLink(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const user = await requireUser();
-  // Messages are rendered in the visitor's language (the "lang" cookie travels with the action request).
-  const t = await getT();
 
   const values: CreateLinkValues = {
     targetUrl: String(formData.get("targetUrl") ?? ""),
@@ -48,7 +51,7 @@ export async function createLink(_prev: ActionState, formData: FormData): Promis
   if (!parsed.success) {
     const urlIssue = parsed.error.issues[0]?.path[0] === "targetUrl";
     return {
-      error: t(urlIssue ? "errors.invalidUrl" : "errors.invalidInput"),
+      errorKey: urlIssue ? "errors.invalidUrl" : "errors.invalidInput",
       field: urlIssue ? "targetUrl" : undefined,
       values,
     };
@@ -56,10 +59,10 @@ export async function createLink(_prev: ActionState, formData: FormData): Promis
 
   let { slug } = parsed.data;
   if (slug) {
-    if (isReservedSlug(slug)) return { error: t("errors.slugReserved", { slug }), field: "slug", values };
-    if (!isValidSlug(slug)) return { error: t("errors.slugFormat"), field: "slug", values };
+    if (isReservedSlug(slug)) return { errorKey: "errors.slugReserved", errorVars: { slug }, field: "slug", values };
+    if (!isValidSlug(slug)) return { errorKey: "errors.slugFormat", field: "slug", values };
     const existing = await prisma.link.findUnique({ where: { slug } });
-    if (existing) return { error: t("errors.slugTaken", { slug }), field: "slug", values };
+    if (existing) return { errorKey: "errors.slugTaken", errorVars: { slug }, field: "slug", values };
   } else {
     do {
       slug = randomSlug();

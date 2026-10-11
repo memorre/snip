@@ -4,7 +4,7 @@ import type { Dictionary } from "../types";
 
 export const zhCN: Dictionary = {
   meta: {
-    title: "Snip — 带实时分析的短链接",
+    title: "Snip｜带实时分析的短链接",
     description: "创建短链接，实时查看每一次点击：来源渠道、设备、浏览器和地理位置，一目了然。",
     login: "登录",
     dashboard: "控制台",
@@ -103,6 +103,7 @@ export const zhCN: Dictionary = {
       invalid: "邮箱或密码不正确。",
       demo: "演示账户登录失败，请重试。",
       generic: "出了点问题，请重试。",
+      missing: "请输入邮箱和密码。",
     },
   },
 
@@ -164,6 +165,9 @@ export const zhCN: Dictionary = {
     slugTaken: "“{slug}”已被占用。",
     unauthorized: "请先登录。",
     notFound: "未找到该链接。",
+    unexpectedTitle: "出了点问题",
+    unexpectedBody: "请稍后重试。",
+    retry: "重试",
   },
 
   analytics: {
@@ -173,8 +177,8 @@ export const zhCN: Dictionary = {
     disabled: "已停用",
     summary: "概览",
     stats: {
-      clicks: { other: "{count} 天点击量" },
-      average: "日均点击",
+      clicks: { other: "近 {count} 天点击量" },
+      average: "日均点击量",
       created: "创建时间",
     },
     chart: {

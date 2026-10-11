@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 
 export function CreateLinkDialog() {
@@ -27,15 +28,13 @@ export function CreateLinkDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button
-        onClick={() => {
-          setFormKey((k) => k + 1);
-          setOpen(true);
-        }}
-      >
-        <Plus className="-ml-1 h-4 w-4" strokeWidth={2.25} />
-        {t("dashboard.newLink")}
-      </Button>
+      {/* A real trigger, so Radix returns focus to this button when the dialog closes. */}
+      <DialogTrigger asChild>
+        <Button data-new-link onClick={() => setFormKey((k) => k + 1)}>
+          <Plus className="-ml-1 h-4 w-4" strokeWidth={2.25} />
+          {t("dashboard.newLink")}
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("create.title")}</DialogTitle>
@@ -66,7 +65,9 @@ function CreateLinkForm({ onClose }: { onClose: () => void }) {
   }, [state]);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    // noValidate: the browser's own validation bubbles would appear in the browser's language, not the
+    // page's. The server action checks the URL and returns a localized message instead.
+    <form action={formAction} noValidate className="flex flex-col gap-4">
       {!shortUrl && (
         <>
           <div className="flex flex-col gap-1.5">
@@ -103,9 +104,9 @@ function CreateLinkForm({ onClose }: { onClose: () => void }) {
         </>
       )}
 
-      {state?.error && (
+      {state?.errorKey && (
         <p role="alert" className="rounded-xl bg-danger-soft px-3.5 py-2.5 text-[13px] text-danger">
-          {state.error}
+          {t(state.errorKey, state.errorVars)}
         </p>
       )}
 
@@ -171,7 +172,7 @@ function OptionalField({
     <div className="flex min-w-0 flex-col gap-1.5">
       <div className="flex items-baseline justify-between gap-2">
         <Label htmlFor={id}>{label}</Label>
-        <span className="text-[12px] text-muted-2">{t("common.optional")}</span>
+        <span className="text-[12px] text-muted">{t("common.optional")}</span>
       </div>
       <Input
         id={id}

@@ -35,7 +35,7 @@ export const fr: Dictionary = {
   },
 
   landing: {
-    eyebrow: "Raccourcisseur de liens avec statistiques en direct",
+    eyebrow: "Liens courts et statistiques en direct",
     taglineLead: "Chaque clic,",
     taglineAccent: "suivi en direct",
     lead: "Snip transforme une longue URL en lien court, puis vous montre qui a cliqué, d’où et sur quel appareil, au moment même où cela se produit.",
@@ -105,11 +105,12 @@ export const fr: Dictionary = {
       invalid: "E-mail ou mot de passe incorrect.",
       demo: "Impossible de se connecter au compte de démonstration. Veuillez réessayer.",
       generic: "Une erreur s’est produite. Veuillez réessayer.",
+      missing: "Saisissez votre e-mail et votre mot de passe.",
     },
   },
 
   dashboard: {
-    welcome: "Bon retour",
+    welcome: "Content de vous revoir",
     newLink: "Nouveau lien",
     summary: "Résumé",
     stats: {
@@ -122,10 +123,10 @@ export const fr: Dictionary = {
     clicks: { one: "{count} clic", many: "{count} de clics", other: "{count} clics" },
     created: "Créé {time}",
     createdJustNow: "Créé à l’instant",
-    analytics: "Stats",
+    analytics: "Statistiques",
     copy: "Copier le lien",
     copied: "Lien copié",
-    toggle: "Lien activé",
+    toggle: "Activer le lien",
     delete: "Supprimer le lien",
     deleted: "/{slug} a été supprimé",
     empty: {
@@ -147,7 +148,7 @@ export const fr: Dictionary = {
 
   create: {
     title: "Créer un lien court",
-    description: "Collez une URL. Snip génère un alias, ou choisissez le vôtre.",
+    description: "Collez une URL. Snip génère un alias, mais vous pouvez aussi choisir le vôtre.",
     destination: "URL de destination",
     destinationPlaceholder: "https://exemple.com/un/long/chemin",
     slug: "Alias personnalisé",
@@ -172,6 +173,9 @@ export const fr: Dictionary = {
     slugTaken: "« {slug} » est déjà utilisé.",
     unauthorized: "Veuillez vous connecter pour continuer.",
     notFound: "Lien introuvable.",
+    unexpectedTitle: "Une erreur s’est produite",
+    unexpectedBody: "Veuillez réessayer dans un instant.",
+    retry: "Réessayer",
   },
 
   analytics: {
@@ -183,7 +187,7 @@ export const fr: Dictionary = {
     stats: {
       clicks: { one: "Clics sur le dernier jour", other: "Clics sur {count} jours" },
       average: "Moyenne par jour",
-      created: "Créé",
+      created: "Date de création",
     },
     chart: {
       title: "Évolution des clics",

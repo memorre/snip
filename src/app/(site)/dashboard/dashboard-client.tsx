@@ -38,6 +38,8 @@ export function DashboardClient({
     refreshInterval: 20000,
   });
   const [pendingDelete, setPendingDelete] = React.useState<LinkSummaryDTO | null>(null);
+  // The row's delete button that opened the confirmation, so focus can go back to it on close.
+  const returnFocusRef = React.useRef<HTMLElement | null>(null);
 
   const [origin, setOrigin] = React.useState("");
   React.useEffect(() => {
@@ -62,6 +64,8 @@ export function DashboardClient({
   async function confirmDelete() {
     const link = pendingDelete;
     if (!link) return;
+    // The row is about to go (it fades out for a moment), so send focus to "New link" instead.
+    returnFocusRef.current = null;
     setPendingDelete(null);
     mutate(
       links.filter((l) => l.id !== link.id),
@@ -142,7 +146,10 @@ export function DashboardClient({
                         createdLabel={createdLabel(link.createdAt)}
                         onCopy={() => copy(link.slug)}
                         onToggle={() => handleToggle(link)}
-                        onDelete={() => setPendingDelete(link)}
+                        onDelete={(e) => {
+                          returnFocusRef.current = e.currentTarget;
+                          setPendingDelete(link);
+                        }}
                       />
                     </motion.li>
                   ))}
@@ -154,7 +161,18 @@ export function DashboardClient({
       </div>
 
       <Dialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>
-        <DialogContent hideClose className="max-w-sm">
+        <DialogContent
+          hideClose
+          className="max-w-sm"
+          onCloseAutoFocus={(e) => {
+            // This dialog has no Radix trigger, so return focus by hand: to the row's delete button, or
+            // to "New link" when that row was just deleted.
+            e.preventDefault();
+            const el = returnFocusRef.current;
+            (el?.isConnected ? el : document.querySelector<HTMLElement>("[data-new-link]"))?.focus();
+            returnFocusRef.current = null;
+          }}
+        >
           {pendingDelete && (
             <>
               <DialogHeader className="pr-0">
@@ -201,7 +219,7 @@ function LinkRow({
   createdLabel: string;
   onCopy: () => void;
   onToggle: () => void;
-  onDelete: () => void;
+  onDelete: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }) {
   const { t } = useI18n();
   return (
@@ -228,7 +246,7 @@ function LinkRow({
             {link.disabled && <Badge variant="warning">{t("dashboard.disabled")}</Badge>}
           </div>
           <p className="mt-0.5 truncate text-[13px] text-muted">{link.targetUrl}</p>
-          <p className="mt-1 text-[12px] text-muted-2" suppressHydrationWarning>
+          <p className="mt-1 text-[12px] text-muted" suppressHydrationWarning>
             {t("dashboard.clicks", { count: link.totalClicks })} · {createdLabel}
           </p>
         </div>

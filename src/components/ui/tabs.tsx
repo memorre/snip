@@ -20,7 +20,7 @@ export function TabsTrigger({ className, ...props }: React.ComponentPropsWithout
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        "whitespace-nowrap rounded-full px-3 py-1 text-[13px] font-medium text-muted transition-[color,background-color,box-shadow] duration-200 hover:text-foreground focus-visible:outline-offset-0 data-[state=active]:bg-[var(--seg-thumb)] data-[state=active]:text-foreground data-[state=active]:shadow-[0_1px_3px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(0,0,0,0.04)] max-sm:py-1.5",
+        "whitespace-nowrap rounded-full px-3 py-1 text-[13px] font-medium text-[var(--seg-text)] transition-[color,background-color,box-shadow] duration-200 hover:text-foreground focus-visible:outline-offset-0 data-[state=active]:bg-[var(--seg-thumb)] data-[state=active]:text-foreground data-[state=active]:shadow-[0_1px_3px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(0,0,0,0.04)] max-sm:py-1.5",
         className
       )}
       {...props}
@@ -31,7 +31,7 @@ export function TabsTrigger({ className, ...props }: React.ComponentPropsWithout
 export function TabsContent({ className, ...props }: React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>) {
   return (
     <TabsPrimitive.Content
-      className={cn("mt-4 animate-in fade-in-0 duration-300 focus-visible:outline-none", className)}
+      className={cn("mt-4 rounded-[12px] animate-in fade-in-0 duration-300", className)}
       {...props}
     />
   );

@@ -104,6 +104,7 @@ export const en = {
       invalid: "Incorrect email or password.",
       demo: "Couldn’t sign in to the demo account. Please try again.",
       generic: "Something went wrong. Please try again.",
+      missing: "Enter your email and password.",
     },
   },
 
@@ -121,10 +122,10 @@ export const en = {
     clicks: { one: "{count} click", other: "{count} clicks" },
     created: "Created {time}",
     createdJustNow: "Created just now",
-    analytics: "Stats",
+    analytics: "Analytics",
     copy: "Copy link",
     copied: "Link copied",
-    toggle: "Link enabled",
+    toggle: "Enable link",
     delete: "Delete link",
     deleted: "Deleted /{slug}",
     empty: {
@@ -169,6 +170,9 @@ export const en = {
     slugTaken: "“{slug}” is already taken.",
     unauthorized: "Please sign in to continue.",
     notFound: "Link not found.",
+    unexpectedTitle: "Something went wrong",
+    unexpectedBody: "Please try again in a moment.",
+    retry: "Try again",
   },
 
   analytics: {

@@ -22,19 +22,29 @@ const FEATURES = [
   { icon: QrCode, key: "login.features.qr", color: "#0071e3" },
 ] as const;
 
-export function LoginForm() {
+/**
+ * `initialErrorKey` carries an Auth.js error from the URL (/login?error=…), which Auth.js redirects to
+ * instead of showing its own English error page.
+ */
+export function LoginForm({ initialErrorKey = null }: { initialErrorKey?: MessageKey | null }) {
   const t = useT();
   const router = useRouter();
   // Stored as a message key so the error follows a language switch.
-  const [errorKey, setErrorKey] = React.useState<MessageKey | null>(null);
+  const [errorKey, setErrorKey] = React.useState<MessageKey | null>(initialErrorKey);
   const [pending, setPending] = React.useState(false);
   const [demoPending, setDemoPending] = React.useState(false);
+  const invalid = errorKey === "login.errors.invalid" || errorKey === "login.errors.missing";
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    // The form is noValidate (the browser's bubbles would be in the browser's language), so check here.
+    if (!String(formData.get("email") ?? "").trim() || !String(formData.get("password") ?? "")) {
+      setErrorKey("login.errors.missing");
+      return;
+    }
     setPending(true);
     setErrorKey(null);
-    const formData = new FormData(e.currentTarget);
     try {
       const res = await signIn("credentials", {
         email: formData.get("email"),
@@ -89,7 +99,7 @@ export function LoginForm() {
         </div>
 
         <Card className="mt-8 p-6 sm:p-8">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="email">{t("login.email")}</Label>
               <Input
@@ -99,7 +109,7 @@ export function LoginForm() {
                 placeholder={t("login.emailPlaceholder")}
                 required
                 autoComplete="email"
-                aria-invalid={errorKey === "login.errors.invalid" || undefined}
+                aria-invalid={invalid || undefined}
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -111,7 +121,7 @@ export function LoginForm() {
                 placeholder="••••••••"
                 required
                 autoComplete="current-password"
-                aria-invalid={errorKey === "login.errors.invalid" || undefined}
+                aria-invalid={invalid || undefined}
               />
             </div>
 

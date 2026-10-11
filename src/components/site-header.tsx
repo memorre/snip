@@ -37,7 +37,7 @@ export function SiteHeader() {
 
   return (
     <header className="glass sticky top-0 z-40 h-12 border-b border-[var(--nav-line)]">
-      <div className="mx-auto flex h-full max-w-[1024px] items-center gap-5 px-4 sm:px-6">
+      <div className="mx-auto flex h-full max-w-[980px] items-center gap-5 px-4 sm:px-6">
         <Link
           href="/"
           aria-label={t("nav.home")}
@@ -86,12 +86,12 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="sm:hidden" asChild>
                   <Link href="/dashboard">
-                    <LayoutDashboard className="h-4 w-4 text-muted" strokeWidth={1.75} />
+                    <LayoutDashboard className="h-4 w-4 text-muted group-data-[highlighted]:text-current" strokeWidth={1.75} />
                     {t("nav.dashboard")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => signOut({ callbackUrl: "/" })}>
-                  <LogOut className="h-4 w-4 text-muted" strokeWidth={1.75} />
+                  <LogOut className="h-4 w-4 text-muted group-data-[highlighted]:text-current" strokeWidth={1.75} />
                   {t("nav.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>

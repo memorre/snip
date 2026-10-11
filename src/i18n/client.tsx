@@ -15,6 +15,8 @@ type I18nValue = {
     day: (isoDay: string, options?: Intl.DateTimeFormatOptions) => string;
     /** "3 days ago" in the active language, or the localized "just now" under a minute. */
     relative: (value: Date | string | number) => string;
+    /** Compact relative time for narrow columns: "38 min. ago", "il y a 38 min", "hace 38 min". */
+    relativeShort: (value: Date | string | number) => string;
     /** Like relative(), but null under a minute so callers can phrase "just now" themselves. */
     since: (value: Date | string | number) => string | null;
     region: (code: string) => string;
@@ -43,6 +45,7 @@ export function I18nProvider({
         date: (value, options) => formatDate(locale, value, options),
         day: (isoDay, options) => formatDay(locale, isoDay, options),
         relative: (value) => formatRelative(locale, value) ?? t("common.justNow"),
+        relativeShort: (value) => formatRelative(locale, value, "short") ?? t("common.justNow"),
         since: (value) => formatRelative(locale, value),
         region: (code) => regionName(locale, code),
       },

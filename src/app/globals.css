@@ -25,11 +25,13 @@
   --primary-soft: rgba(0, 113, 227, 0.1);
   --link: #0066cc;
 
-  --danger: #e30000;
+  /* Text and icon red, AA on white and on --danger-soft. Filled buttons use --danger-fill. */
+  --danger: #d70015;
+  --danger-fill: #d70015;
   --danger-soft: rgba(255, 59, 48, 0.1);
   --warning: #b25000;
   --warning-soft: rgba(255, 159, 10, 0.14);
-  --success: #248a3d;
+  --success: #1d7a33;
   --success-soft: rgba(52, 199, 89, 0.14);
   --live: #34c759;
 
@@ -47,6 +49,8 @@
   --popover: rgba(255, 255, 255, 0.82);
   --seg-bg: rgba(118, 118, 128, 0.12);
   --seg-thumb: #ffffff;
+  /* Inactive segment and quiet-pill text: AA on the grey track and on --fill */
+  --seg-text: #636366;
   --switch-off: #e9e9eb;
 
   --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
@@ -83,7 +87,8 @@
   --primary-soft: rgba(10, 132, 255, 0.18);
   --link: #2997ff;
 
-  --danger: #ff453a;
+  --danger: #ff6961;
+  --danger-fill: #d70015;
   --danger-soft: rgba(255, 69, 58, 0.16);
   --warning: #ff9f0a;
   --warning-soft: rgba(255, 159, 10, 0.16);
@@ -104,6 +109,7 @@
   --popover: rgba(36, 36, 38, 0.82);
   --seg-bg: rgba(118, 118, 128, 0.24);
   --seg-thumb: #636366;
+  --seg-text: #a1a1a6;
   --switch-off: #39393d;
 
   --card-shadow: none;
@@ -140,6 +146,7 @@
   --color-link: var(--link);
 
   --color-danger: var(--danger);
+  --color-danger-fill: var(--danger-fill);
   --color-danger-soft: var(--danger-soft);
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);

@@ -24,12 +24,13 @@ import { useLiveClicks } from "@/hooks/use-live-clicks";
 import type { LinkStatsDTO } from "@/lib/data";
 import { DIRECT_REFERRER, UNKNOWN_LABEL } from "@/lib/stats-labels";
 import { useI18n } from "@/i18n/client";
+import { isCountryCity } from "@/i18n/format";
 import type { MessageKey } from "@/i18n/types";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QrCodeCard } from "@/components/qr-code";
 
 type LinkMeta = {
@@ -62,6 +63,14 @@ function useLabels() {
       plain: (label: string) => (label === UNKNOWN_LABEL ? t("analytics.unknown") : label),
       country: (code: string | null) => (!code || code === UNKNOWN_LABEL ? t("analytics.unknown") : fmt.region(code)),
       device: (type: string) => t((DEVICE_META[type] ?? FALLBACK_DEVICE).label),
+      /**
+       * A city (English, from the geo header) and its localized country. For city-states the city is
+       * the country, so only the localized name is shown: "Singapour", not "Singapore · Singapour".
+       */
+      place: (city: string, country: string | null) => {
+        if (country && isCountryCity(city, country)) return { city: fmt.region(country), country: undefined };
+        return { city, country: country ? fmt.region(country) : undefined };
+      },
     }),
     [t, fmt]
   );
@@ -143,8 +152,21 @@ export function LinkAnalyticsClient({ link, initialStats }: { link: LinkMeta; in
           transition={{ duration: 0.6, delay: 0.05, ease: EASE }}
           className="mt-8 flex flex-col gap-4"
         >
-          <Card aria-label={t("analytics.summary")} className="grid grid-cols-3 divide-x divide-separator py-5">
-            <Stat label={t("analytics.stats.clicks", { count: days })} value={fmt.number(stats.totalClicks)} />
+          <Card
+            role="group"
+            aria-label={t("analytics.summary")}
+            aria-busy={isLoading || undefined}
+            className={cn(
+              "grid grid-cols-3 divide-x divide-separator py-5 transition-opacity duration-300",
+              isLoading && "opacity-50"
+            )}
+          >
+            {/* The label follows the data on screen, so a range that is still loading never shows the
+                previous range's total under the new range's name. */}
+            <Stat
+              label={t("analytics.stats.clicks", { count: stats.daily.length })}
+              value={fmt.number(stats.totalClicks)}
+            />
             <Stat
               label={t("analytics.stats.average")}
               value={fmt.number(average, { maximumFractionDigits: average > 0 && average < 1 ? 2 : 1 })}
@@ -156,11 +178,11 @@ export function LinkAnalyticsClient({ link, initialStats }: { link: LinkMeta; in
             />
           </Card>
 
-          {/* Daily trend */}
+          {/* Daily trend: the range control's tab panel is the chart, so aria-controls points somewhere real. */}
           <Card className="p-5 sm:p-6">
-            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-[17px] font-semibold tracking-tight">{t("analytics.chart.title")}</h2>
-              <Tabs value={String(days)} onValueChange={(v) => setDays(Number(v))}>
+            <Tabs value={String(days)} onValueChange={(v) => setDays(Number(v))}>
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-[17px] font-semibold tracking-tight">{t("analytics.chart.title")}</h2>
                 <TabsList aria-label={t("analytics.chart.range")}>
                   {RANGES.map((r) => (
                     <TabsTrigger key={r} value={String(r)}>
@@ -168,47 +190,49 @@ export function LinkAnalyticsClient({ link, initialStats }: { link: LinkMeta; in
                     </TabsTrigger>
                   ))}
                 </TabsList>
-              </Tabs>
-            </div>
-            <div
-              role="img"
-              aria-label={t("analytics.chart.label")}
-              className={cn("h-60 transition-opacity duration-300", isLoading ? "opacity-50" : "opacity-100")}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 8, right: 0, left: 0, bottom: 0 }} barCategoryGap="22%">
-                  <CartesianGrid vertical={false} stroke="var(--separator)" />
-                  <XAxis
-                    dataKey="label"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    minTickGap={24}
-                    interval="preserveStartEnd"
-                    tick={{ fill: "var(--muted)", fontSize: 11 }}
-                  />
-                  <YAxis
-                    allowDecimals={false}
-                    tickLine={false}
-                    axisLine={false}
-                    width={34}
-                    tick={{ fill: "var(--muted)", fontSize: 11 }}
-                    tickFormatter={(v: number) => fmt.number(v)}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "var(--seg-bg)" }}
-                    content={(props: TooltipContentProps) => <ChartTooltip {...props} />}
-                  />
-                  <Bar
-                    dataKey="clicks"
-                    fill="var(--chart-blue)"
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={22}
-                    animationDuration={600}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+              </div>
+              <TabsContent value={String(days)} className="mt-0">
+                <div
+                  role="img"
+                  aria-label={t("analytics.chart.label")}
+                  className={cn("h-60 transition-opacity duration-300", isLoading ? "opacity-50" : "opacity-100")}
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData} margin={{ top: 8, right: 0, left: 0, bottom: 0 }} barCategoryGap="22%">
+                      <CartesianGrid vertical={false} stroke="var(--separator)" />
+                      <XAxis
+                        dataKey="label"
+                        tickLine={false}
+                        axisLine={false}
+                        tickMargin={8}
+                        minTickGap={24}
+                        interval="preserveStartEnd"
+                        tick={{ fill: "var(--muted)", fontSize: 11 }}
+                      />
+                      <YAxis
+                        allowDecimals={false}
+                        tickLine={false}
+                        axisLine={false}
+                        width={34}
+                        tick={{ fill: "var(--muted)", fontSize: 11 }}
+                        tickFormatter={(v: number) => fmt.number(v)}
+                      />
+                      <Tooltip
+                        cursor={{ fill: "var(--seg-bg)" }}
+                        content={(props: TooltipContentProps) => <ChartTooltip {...props} />}
+                      />
+                      <Bar
+                        dataKey="clicks"
+                        fill="var(--chart-blue)"
+                        radius={[4, 4, 0, 0]}
+                        maxBarSize={22}
+                        animationDuration={600}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </TabsContent>
+            </Tabs>
           </Card>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -281,12 +305,10 @@ export function LinkAnalyticsClient({ link, initialStats }: { link: LinkMeta; in
             <BreakdownCard
               title={t("analytics.cities")}
               color="var(--chart-orange)"
-              entries={(stats.byCity ?? []).map((e) => ({
-                key: `${e.country ?? ""}|${e.city}`,
-                label: e.city,
-                sublabel: e.country ? labels.country(e.country) : undefined,
-                count: e.count,
-              }))}
+              entries={(stats.byCity ?? []).map((e) => {
+                const place = labels.place(e.city, e.country);
+                return { key: `${e.country ?? ""}|${e.city}`, label: place.city, sublabel: place.country, count: e.count };
+              })}
             />
           </div>
 
@@ -402,7 +424,7 @@ function RecentClicks({ recent, connected }: { recent: LinkStatsDTO["recent"]; c
         <span
           className={cn(
             "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium",
-            connected ? "bg-success-soft text-success" : "bg-fill text-muted"
+            connected ? "bg-success-soft text-success" : "bg-fill text-[var(--seg-text)]"
           )}
         >
           <span className={cn("h-1.5 w-1.5 rounded-full", connected ? "animate-pulse-ring bg-live" : "bg-muted-2")} />
@@ -412,11 +434,17 @@ function RecentClicks({ recent, connected }: { recent: LinkStatsDTO["recent"]; c
       {rows.length === 0 ? (
         <EmptyNote>{t("analytics.noClicks")}</EmptyNote>
       ) : (
-        <ul aria-live="polite" className="flex flex-col">
+        // No aria-live here: the "New click" toast already announces each click, and a live list would
+        // also read out every relative time as it ticks over.
+        <ul className="flex flex-col">
           <AnimatePresence initial={false}>
             {rows.map((c, i) => {
               const Icon = (DEVICE_META[c.deviceType] ?? FALLBACK_DEVICE).icon;
-              const place = c.city ? `${c.city} · ${labels.country(c.country)}` : labels.country(c.country);
+              let place = labels.country(c.country);
+              if (c.city) {
+                const p = labels.place(c.city, c.country);
+                place = p.country ? `${p.city} · ${p.country}` : p.city;
+              }
               return (
                 <motion.li
                   key={c.key}
@@ -441,9 +469,9 @@ function RecentClicks({ recent, connected }: { recent: LinkStatsDTO["recent"]; c
                   <time
                     dateTime={c.createdAt}
                     suppressHydrationWarning
-                    className="shrink-0 text-[12px] tabular-nums text-muted-2"
+                    className="shrink-0 text-[12px] tabular-nums text-muted"
                   >
-                    {fmt.relative(c.createdAt)}
+                    {fmt.relativeShort(c.createdAt)}
                   </time>
                 </motion.li>
               );

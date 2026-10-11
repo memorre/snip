@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { Providers } from "@/components/providers";
-import { SiteHeader } from "@/components/site-header";
-import { getDictionary, getLocale, getT } from "@/i18n/server";
+import { getLocale, getT } from "@/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -22,17 +20,13 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   // Resolved per request from the "lang" cookie, then Accept-Language, so the first paint is already
-  // in the right language.
+  // in the right language. The UI shell (providers, nav, dictionary) is added by app/(site)/layout.tsx
+  // and app/not-found.tsx, so the /[slug] redirect route does no more than read the locale.
   const locale = await getLocale();
 
   return (
     <html lang={locale} suppressHydrationWarning className="h-full">
-      <body className="flex min-h-full flex-col">
-        <Providers locale={locale} dictionary={getDictionary(locale)}>
-          <SiteHeader />
-          <main className="flex flex-1 flex-col">{children}</main>
-        </Providers>
-      </body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }
