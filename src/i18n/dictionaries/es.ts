@@ -171,6 +171,8 @@ export const es: Dictionary = {
     slugTaken: "“{slug}” ya está en uso.",
     unauthorized: "Inicia sesión para continuar.",
     notFound: "No se encontró el enlace.",
+    crossOrigin: "No se permiten solicitudes desde otros sitios.",
+    unsupportedMediaType: "Envía el cuerpo de la solicitud en formato JSON.",
     unexpectedTitle: "Algo salió mal",
     unexpectedBody: "Inténtalo de nuevo en un momento.",
     retry: "Reintentar",
