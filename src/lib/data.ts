@@ -1,4 +1,5 @@
 import { cache } from "react";
+import type { Link } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { DIRECT_REFERRER, UNKNOWN_LABEL } from "@/lib/stats-labels";
 
@@ -8,7 +9,24 @@ export async function listLinksForUser(userId: string) {
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { clicks: true } } },
   });
+  return summarizeLinks(links);
+}
 
+/** One of the user's links, with the same counts as the list. Null if they own no link with that slug. */
+export async function getLinkSummaryForUser(userId: string, slug: string) {
+  const link = await prisma.link.findFirst({
+    where: { slug, ownerId: userId },
+    include: { _count: { select: { clicks: true } } },
+  });
+  if (!link) return null;
+  const [summary] = await summarizeLinks([link]);
+  return { ...summary, expiresAt: link.expiresAt?.toISOString() ?? null };
+}
+
+type LinkWithClickCount = Link & { _count: { clicks: number } };
+
+/** Adds the rolling 7-day click count and shapes links for the client (dates as ISO strings). */
+async function summarizeLinks(links: LinkWithClickCount[]) {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const recentCounts = await prisma.click.groupBy({
     by: ["linkId"],
@@ -30,6 +48,7 @@ export async function listLinksForUser(userId: string) {
 }
 
 export type LinkSummaryDTO = Awaited<ReturnType<typeof listLinksForUser>>[number];
+export type LinkDetailDTO = NonNullable<Awaited<ReturnType<typeof getLinkSummaryForUser>>>;
 
 /** Memoised per request, so a page and its generateMetadata share one query. */
 export const getLinkForOwner = cache(async (slug: string, ownerId: string) => {

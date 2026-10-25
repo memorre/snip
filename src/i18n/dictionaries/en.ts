@@ -170,6 +170,8 @@ export const en = {
     slugTaken: "“{slug}” is already taken.",
     unauthorized: "Please sign in to continue.",
     notFound: "Link not found.",
+    crossOrigin: "Requests from other sites aren’t allowed.",
+    unsupportedMediaType: "Send the request body as JSON.",
     unexpectedTitle: "Something went wrong",
     unexpectedBody: "Please try again in a moment.",
     retry: "Try again",

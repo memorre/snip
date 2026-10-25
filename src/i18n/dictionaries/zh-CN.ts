@@ -165,6 +165,8 @@ export const zhCN: Dictionary = {
     slugTaken: "“{slug}”已被占用。",
     unauthorized: "请先登录。",
     notFound: "未找到该链接。",
+    crossOrigin: "不允许来自其他网站的请求。",
+    unsupportedMediaType: "请以 JSON 格式发送请求内容。",
     unexpectedTitle: "出了点问题",
     unexpectedBody: "请稍后重试。",
     retry: "重试",

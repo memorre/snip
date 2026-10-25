@@ -173,6 +173,8 @@ export const fr: Dictionary = {
     slugTaken: "« {slug} » est déjà utilisé.",
     unauthorized: "Veuillez vous connecter pour continuer.",
     notFound: "Lien introuvable.",
+    crossOrigin: "Les requêtes provenant d’autres sites ne sont pas autorisées.",
+    unsupportedMediaType: "Envoyez le corps de la requête au format JSON.",
     unexpectedTitle: "Une erreur s’est produite",
     unexpectedBody: "Veuillez réessayer dans un instant.",
     retry: "Réessayer",
